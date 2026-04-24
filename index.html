@@ -1,0 +1,3018 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>PraanSetu — AI Patient Triage &amp; ER Queue System | Amnex</title>
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600;700&family=Merriweather:wght@700&family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
+
+<style>
+/* ══ LOGIN PAGE STYLES ══════════════════════════════ */
+
+  :root {
+    --navy-900: #0f2c66;
+    --navy-800: #15387f;
+    --navy-700: #1a3f8f;
+    --navy-600: #2150a8;
+    --navy-50:  #eef2fb;
+    --accent:   #e08a2b;
+    --accent-soft: #f3a64a;
+    --ink:      #2c3142;
+    --ink-soft: #6b7180;
+    --line:     #e3e7ef;
+    --bg:       #f4f6fa;
+    --card:     #ffffff;
+    --success:  #2e9e5f;
+    --success-soft: #e6f5ec;
+    --warn:     #b8861b;
+    --warn-soft: #fdf4e1;
+    --danger:   #c0392b;
+    --danger-soft: #fdecea;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+
+  body {
+    font-family: 'Source Sans 3', system-ui, sans-serif;
+    color: var(--ink);
+    background: var(--bg);
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr 1.05fr;
+    overflow-x: hidden;
+  }
+
+  /* ---------- LEFT BRAND PANEL ---------- */
+  .brand-panel {
+    position: relative;
+    background:
+      radial-gradient(1200px 600px at 20% 10%, rgba(255,255,255,0.06), transparent 60%),
+      radial-gradient(900px 500px at 90% 95%, rgba(224,138,43,0.18), transparent 65%),
+      linear-gradient(160deg, var(--navy-900) 0%, var(--navy-700) 55%, var(--navy-800) 100%);
+    color: #fff;
+    padding: 48px 56px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    overflow: hidden;
+  }
+  .ecg {
+    position: absolute;
+    left: -40px; right: -40px;
+    bottom: 36%;
+    height: 80px;
+    opacity: 0.15;
+    pointer-events: none;
+  }
+  .ecg svg { width: 100%; height: 100%; display: block; }
+  .ecg path {
+    fill: none; stroke: #fff; stroke-width: 2;
+    stroke-linecap: round; stroke-linejoin: round;
+    stroke-dasharray: 2400; stroke-dashoffset: 2400;
+    animation: drawLine 4.5s ease-out 0.4s forwards, pulse 3.2s ease-in-out 5s infinite;
+  }
+  @keyframes drawLine { to { stroke-dashoffset: 0; } }
+  @keyframes pulse { 0%,100% { opacity: 0.15; } 50% { opacity: 0.30; } }
+  .grid-dots {
+    position: absolute; inset: 0;
+    background-image: radial-gradient(rgba(255,255,255,0.07) 1px, transparent 1px);
+    background-size: 22px 22px;
+    mask-image: linear-gradient(180deg, transparent 0%, #000 25%, #000 75%, transparent 100%);
+    pointer-events: none;
+  }
+
+  .brand-top {
+    display: flex; align-items: center; gap: 14px;
+    position: relative; z-index: 2;
+  }
+  .brand-mark {
+    width: 44px; height: 44px; border-radius: 12px;
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.18);
+    display: grid; place-items: center;
+    backdrop-filter: blur(6px);
+  }
+  .brand-mark svg { width: 22px; height: 22px; }
+  .brand-name {
+    font-weight: 600; letter-spacing: 0.5px; font-size: 14px;
+    text-transform: uppercase; color: rgba(255,255,255,0.85);
+  }
+  .brand-name span { color: var(--accent-soft); }
+
+  .brand-hero { position: relative; z-index: 2; max-width: 460px; }
+  .eyebrow {
+    display: inline-block; font-size: 11px; font-weight: 600;
+    letter-spacing: 2.5px; text-transform: uppercase;
+    color: var(--accent-soft);
+    padding: 6px 12px;
+    border: 1px solid rgba(243,166,74,0.35);
+    border-radius: 999px;
+    margin-bottom: 24px;
+  }
+  .brand-hero h1 {
+    font-family: 'Merriweather', Georgia, serif;
+    font-weight: 700;
+    font-size: clamp(30px, 3vw, 40px);
+    line-height: 1.15; letter-spacing: -0.5px;
+    margin-bottom: 16px;
+  }
+  .brand-hero h1 em {
+    font-style: normal; color: var(--accent-soft); position: relative;
+  }
+  .brand-hero h1 em::after {
+    content: ''; position: absolute;
+    left: 0; right: 0; bottom: -4px;
+    height: 3px; background: var(--accent); border-radius: 2px;
+    transform-origin: left; transform: scaleX(0);
+    animation: drawUnder 0.8s ease 1.4s forwards;
+  }
+  @keyframes drawUnder { to { transform: scaleX(1); } }
+  .brand-hero p {
+    color: rgba(255,255,255,0.78);
+    font-size: 15px; line-height: 1.6; max-width: 420px;
+  }
+
+  /* security features list */
+  .sec-features {
+    position: relative; z-index: 2;
+    display: flex; flex-direction: column; gap: 14px;
+    margin: 32px 0 28px;
+  }
+  .sec-item {
+    display: flex; align-items: center; gap: 12px;
+    color: rgba(255,255,255,0.82); font-size: 14px;
+  }
+  .sec-item .ic {
+    width: 32px; height: 32px; border-radius: 8px;
+    background: rgba(243,166,74,0.15);
+    border: 1px solid rgba(243,166,74,0.3);
+    display: grid; place-items: center; flex-shrink: 0;
+  }
+  .sec-item .ic svg { width: 16px; height: 16px; color: var(--accent-soft); }
+  .sec-item strong { color: #fff; font-weight: 600; }
+
+  .brand-foot {
+    position: relative; z-index: 2;
+    color: rgba(255,255,255,0.55); font-size: 12px;
+    letter-spacing: 1.5px; text-transform: uppercase;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .brand-foot .dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--accent-soft);
+    box-shadow: 0 0 0 4px rgba(243,166,74,0.18);
+    animation: blink 2.4s ease-in-out infinite;
+  }
+  @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+  /* ---------- RIGHT LOGIN PANEL ---------- */
+  .login-panel {
+    background: var(--card);
+    display: flex; align-items: center; justify-content: center;
+    padding: 40px;
+    position: relative;
+  }
+  .login-panel::before {
+    content: ''; position: absolute; top: 0; right: 0;
+    width: 240px; height: 240px;
+    background: radial-gradient(circle at top right, rgba(26,63,143,0.06), transparent 70%);
+    pointer-events: none;
+  }
+
+  .login-card {
+    width: 100%; max-width: 460px; position: relative;
+  }
+
+  .logo-wrap {
+    display: flex; justify-content: center; margin-bottom: 20px;
+  }
+  .logo-wrap img { height: 56px; width: auto; object-fit: contain; }
+
+  /* progress stepper */
+  .stepper {
+    display: flex; align-items: center; justify-content: center;
+    gap: 6px; margin-bottom: 24px;
+  }
+  .stepper .s {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 11px; font-weight: 600; color: var(--ink-soft);
+    letter-spacing: 0.5px; text-transform: uppercase;
+  }
+  .stepper .num {
+    width: 22px; height: 22px; border-radius: 50%;
+    background: var(--line); color: var(--ink-soft);
+    display: grid; place-items: center;
+    font-size: 11px; font-weight: 700;
+    transition: all 0.3s ease;
+  }
+  .stepper .s.active .num { background: var(--navy-700); color: #fff; box-shadow: 0 0 0 4px rgba(26,63,143,0.12); }
+  .stepper .s.active { color: var(--navy-900); }
+  .stepper .s.done .num { background: var(--success); color: #fff; }
+  .stepper .bar { width: 28px; height: 2px; background: var(--line); border-radius: 2px; }
+  .stepper .bar.filled { background: var(--success); }
+
+  .step-title {
+    text-align: center; margin-bottom: 6px;
+  }
+  .step-title h2 {
+    font-family: 'Merriweather', Georgia, serif;
+    font-size: 24px; color: var(--navy-900);
+    font-weight: 700; letter-spacing: -0.3px;
+  }
+  .step-title h2::after {
+    content: ''; display: block;
+    width: 40px; height: 3px;
+    background: var(--accent); border-radius: 2px;
+    margin: 10px auto 0;
+  }
+  .step-sub {
+    text-align: center; color: var(--ink-soft);
+    font-size: 14px; margin-bottom: 24px; line-height: 1.5;
+  }
+
+  /* steps container */
+  .steps { position: relative; }
+  .step {
+    display: none;
+    animation: stepIn 0.35s ease;
+  }
+  .step.active { display: block; }
+  @keyframes stepIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  form, .step-body { display: flex; flex-direction: column; gap: 16px; }
+
+  .field { position: relative; }
+  .field label {
+    display: block; font-size: 12px; font-weight: 600;
+    color: var(--navy-900); text-transform: uppercase;
+    letter-spacing: 0.8px; margin-bottom: 8px;
+  }
+  .input-wrap { position: relative; display: flex; align-items: center; }
+  .input-icon {
+    position: absolute; left: 14px;
+    width: 18px; height: 18px;
+    color: var(--navy-700); opacity: 0.55;
+    pointer-events: none;
+    transition: opacity 0.2s ease, color 0.2s ease;
+  }
+  .field input {
+    width: 100%; padding: 12px 14px 12px 44px;
+    border: 1.5px solid var(--line);
+    border-radius: 8px; font-size: 15px;
+    font-family: inherit; color: var(--ink);
+    background: #fbfcfe;
+    transition: border-color 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+  }
+  .field input::placeholder { color: #a4abba; }
+  .field input:focus {
+    outline: none; border-color: var(--navy-700);
+    background: #fff; box-shadow: 0 0 0 4px rgba(26,63,143,0.10);
+  }
+  .field:focus-within .input-icon { opacity: 1; color: var(--navy-800); }
+
+  .pw-toggle {
+    position: absolute; right: 10px;
+    background: none; border: none; cursor: pointer;
+    padding: 6px; color: var(--ink-soft);
+    border-radius: 6px;
+    transition: color 0.15s ease, background 0.15s ease;
+  }
+  .pw-toggle:hover { color: var(--navy-800); background: var(--navy-50); }
+  .pw-toggle svg { width: 18px; height: 18px; display: block; }
+
+  /* password strength */
+  .pw-strength {
+    display: flex; align-items: center; gap: 8px;
+    margin-top: 8px; font-size: 12px;
+  }
+  .pw-bars { display: flex; gap: 3px; flex: 1; }
+  .pw-bars span {
+    flex: 1; height: 4px; border-radius: 2px;
+    background: var(--line); transition: background 0.2s ease;
+  }
+  .pw-label { font-weight: 600; min-width: 56px; text-align: right; }
+  .pw-strength.weak   .pw-bars span:nth-child(-n+1) { background: var(--danger); }
+  .pw-strength.weak   .pw-label { color: var(--danger); }
+  .pw-strength.fair   .pw-bars span:nth-child(-n+2) { background: var(--warn); }
+  .pw-strength.fair   .pw-label { color: var(--warn); }
+  .pw-strength.good   .pw-bars span:nth-child(-n+3) { background: #3a8fd9; }
+  .pw-strength.good   .pw-label { color: #3a8fd9; }
+  .pw-strength.strong .pw-bars span:nth-child(-n+4) { background: var(--success); }
+  .pw-strength.strong .pw-label { color: var(--success); }
+
+  /* CAPTCHA */
+  .captcha-row { display: flex; gap: 10px; align-items: stretch; }
+  .captcha-box {
+    width: 160px; height: 50px;
+    border: 1.5px solid var(--line); border-radius: 8px;
+    background: linear-gradient(135deg, #f0f4fc, #e4ebf7);
+    display: grid; place-items: center;
+    position: relative; overflow: hidden;
+    flex-shrink: 0;
+  }
+  .captcha-box canvas { display: block; }
+  .captcha-refresh {
+    width: 44px; border: 1.5px solid var(--line);
+    background: #fbfcfe; border-radius: 8px;
+    cursor: pointer; color: var(--navy-700);
+    display: grid; place-items: center;
+    transition: all 0.18s ease; flex-shrink: 0;
+  }
+  .captcha-refresh:hover {
+    background: var(--navy-50); border-color: var(--navy-700);
+    transform: rotate(180deg);
+  }
+  .captcha-refresh svg { width: 16px; height: 16px; }
+  .captcha-input {
+    flex: 1; padding: 12px 14px; border: 1.5px solid var(--line);
+    border-radius: 8px; font-size: 15px;
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 4px; text-transform: uppercase;
+    background: #fbfcfe; color: var(--ink);
+    transition: border-color 0.18s ease, box-shadow 0.18s ease;
+  }
+  .captcha-input:focus {
+    outline: none; border-color: var(--navy-700);
+    background: #fff; box-shadow: 0 0 0 4px rgba(26,63,143,0.10);
+  }
+
+  /* row with checkbox + forgot */
+  .row {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-top: -2px;
+  }
+  .check {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 13px; color: var(--ink-soft);
+    cursor: pointer; user-select: none;
+  }
+  .check input { display: none; }
+  .check .box {
+    width: 16px; height: 16px;
+    border: 1.5px solid #c7cdd9; border-radius: 4px;
+    display: grid; place-items: center;
+    transition: all 0.15s ease; background: #fff;
+  }
+  .check .box svg {
+    width: 11px; height: 11px; color: #fff;
+    opacity: 0; transform: scale(0.6);
+    transition: all 0.15s ease;
+  }
+  .check input:checked + .box {
+    background: var(--navy-700); border-color: var(--navy-700);
+  }
+  .check input:checked + .box svg { opacity: 1; transform: scale(1); }
+  .forgot {
+    font-size: 13px; color: var(--navy-700);
+    text-decoration: none; font-weight: 600;
+    transition: color 0.15s ease;
+  }
+  .forgot:hover { color: var(--accent); text-decoration: underline; }
+
+  /* buttons */
+  .btn-primary, .btn-ghost {
+    border: none; cursor: pointer;
+    padding: 13px 16px; border-radius: 8px;
+    font-size: 15px; font-weight: 600;
+    letter-spacing: 0.4px; font-family: inherit;
+    transition: transform 0.08s ease, background 0.15s ease, box-shadow 0.2s ease, color 0.15s ease;
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+  }
+  .btn-primary {
+    background: var(--navy-800); color: #fff;
+    box-shadow: 0 6px 18px -8px rgba(15,44,102,0.6);
+  }
+  .btn-primary:hover { background: var(--navy-900); box-shadow: 0 10px 22px -8px rgba(15,44,102,0.7); }
+  .btn-primary:active { transform: translateY(1px); }
+  .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+  .btn-primary svg { width: 16px; height: 16px; transition: transform 0.2s ease; }
+  .btn-primary:hover svg { transform: translateX(3px); }
+  .btn-ghost {
+    background: transparent; color: var(--navy-700);
+    border: 1.5px solid var(--line);
+  }
+  .btn-ghost:hover { background: var(--navy-50); border-color: var(--navy-700); }
+  .btn-row { display: flex; gap: 10px; }
+  .btn-row .btn-primary, .btn-row .btn-ghost { flex: 1; }
+
+  /* alerts */
+  .alert {
+    display: none; padding: 10px 14px;
+    border-radius: 8px; font-size: 13.5px;
+    margin-bottom: 4px;
+    align-items: flex-start; gap: 8px;
+  }
+  .alert.show { display: flex; }
+  .alert.error   { background: var(--danger-soft); color: var(--danger); border: 1px solid #f5c6c0; }
+  .alert.success { background: var(--success-soft); color: var(--success); border: 1px solid #b9e2ca; }
+  .alert.warn    { background: var(--warn-soft); color: var(--warn); border: 1px solid #f2dbac; }
+  .alert svg { width: 16px; height: 16px; flex-shrink: 0; margin-top: 1px; }
+
+  .attempts-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 11px; font-weight: 600;
+    padding: 4px 10px; border-radius: 999px;
+    background: var(--warn-soft); color: var(--warn);
+    letter-spacing: 0.3px;
+  }
+  .attempts-badge.ok { background: var(--success-soft); color: var(--success); }
+  .attempts-badge .dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: currentColor;
+  }
+
+  /* ---------- STEP 2: 2FA METHOD SELECTION ---------- */
+  .methods { display: flex; flex-direction: column; gap: 10px; }
+  .method {
+    display: flex; align-items: center; gap: 14px;
+    padding: 14px; border: 1.5px solid var(--line);
+    border-radius: 10px; cursor: pointer;
+    background: #fbfcfe;
+    transition: all 0.18s ease;
+    position: relative;
+  }
+  .method:hover {
+    border-color: var(--navy-600);
+    background: #fff;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px -10px rgba(15,44,102,0.25);
+  }
+  .method.selected {
+    border-color: var(--navy-700); background: #fff;
+    box-shadow: 0 0 0 4px rgba(26,63,143,0.08), 0 6px 18px -10px rgba(15,44,102,0.25);
+  }
+  .method .m-icon {
+    width: 44px; height: 44px; border-radius: 10px;
+    display: grid; place-items: center;
+    background: linear-gradient(135deg, var(--navy-50), #dfe7f5);
+    color: var(--navy-700); flex-shrink: 0;
+  }
+  .method.selected .m-icon {
+    background: linear-gradient(135deg, var(--navy-700), var(--navy-900));
+    color: #fff;
+  }
+  .method .m-icon svg { width: 22px; height: 22px; }
+  .method .m-body { flex: 1; }
+  .method .m-title {
+    font-weight: 600; color: var(--navy-900); font-size: 14px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .method .m-sub { font-size: 12.5px; color: var(--ink-soft); margin-top: 2px; }
+  .method .m-tag {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.5px;
+    padding: 2px 7px; border-radius: 4px;
+    background: var(--accent); color: #fff; text-transform: uppercase;
+  }
+  .method .m-tag.rec {
+    background: var(--success-soft); color: var(--success);
+  }
+  .method .m-check {
+    width: 22px; height: 22px; border-radius: 50%;
+    border: 2px solid var(--line);
+    display: grid; place-items: center; flex-shrink: 0;
+    transition: all 0.18s ease;
+  }
+  .method.selected .m-check {
+    background: var(--navy-700); border-color: var(--navy-700);
+  }
+  .method .m-check svg {
+    width: 12px; height: 12px; color: #fff;
+    opacity: 0; transform: scale(0.5);
+    transition: all 0.18s ease;
+  }
+  .method.selected .m-check svg { opacity: 1; transform: scale(1); }
+
+  /* ---------- STEP 3A: OTP ---------- */
+  .otp-info {
+    background: var(--navy-50); border: 1px solid #dfe7f5;
+    border-radius: 8px; padding: 12px 14px;
+    display: flex; align-items: center; gap: 10px;
+    font-size: 13px; color: var(--navy-900);
+  }
+  .otp-info strong { font-weight: 700; font-family: 'JetBrains Mono', monospace; }
+  .otp-info svg { width: 18px; height: 18px; color: var(--navy-700); flex-shrink: 0; }
+
+  .otp-inputs {
+    display: flex; gap: 8px; justify-content: space-between;
+    margin: 8px 0;
+  }
+  .otp-inputs input {
+    width: 100%; max-width: 56px; aspect-ratio: 1;
+    border: 1.5px solid var(--line); border-radius: 10px;
+    text-align: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 22px; font-weight: 600;
+    color: var(--navy-900);
+    background: #fbfcfe;
+    transition: border-color 0.18s ease, box-shadow 0.18s ease, background 0.18s ease, transform 0.1s ease;
+  }
+  .otp-inputs input:focus {
+    outline: none; border-color: var(--navy-700);
+    background: #fff; box-shadow: 0 0 0 4px rgba(26,63,143,0.12);
+    transform: translateY(-2px);
+  }
+  .otp-inputs input.filled {
+    border-color: var(--navy-600); background: #fff;
+  }
+
+  .otp-timer {
+    text-align: center; font-size: 13px; color: var(--ink-soft);
+  }
+  .otp-timer strong {
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--navy-900); font-size: 14px;
+  }
+  .otp-timer a {
+    color: var(--navy-700); font-weight: 600; text-decoration: none;
+  }
+  .otp-timer a:hover { color: var(--accent); text-decoration: underline; }
+  .otp-timer a.disabled {
+    color: var(--ink-soft); pointer-events: none; cursor: not-allowed;
+  }
+
+  /* ---------- STEP 3B: FACIAL ---------- */
+  .face-stage {
+    display: flex; flex-direction: column; align-items: center; gap: 14px;
+    padding: 6px 0;
+  }
+  .face-viewport {
+    width: 220px; height: 220px; border-radius: 50%;
+    background: linear-gradient(135deg, #0f2c66, #1a3f8f);
+    overflow: hidden; position: relative;
+    box-shadow: 0 0 0 6px #fff, 0 0 0 8px var(--line), 0 12px 40px -12px rgba(15,44,102,0.4);
+  }
+  .face-viewport video, .face-viewport .placeholder {
+    width: 100%; height: 100%; object-fit: cover; display: block;
+  }
+  .face-viewport .placeholder {
+    display: grid; place-items: center;
+    color: rgba(255,255,255,0.5);
+  }
+  .face-viewport .placeholder svg { width: 60px; height: 60px; }
+  .face-scan {
+    position: absolute; inset: 0; pointer-events: none;
+    border-radius: 50%;
+  }
+  .face-scan::before {
+    content: ''; position: absolute;
+    left: 10%; right: 10%;
+    top: 50%; height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent-soft), transparent);
+    box-shadow: 0 0 20px var(--accent-soft);
+    transform: translateY(-50%);
+    animation: scanBar 2s ease-in-out infinite;
+  }
+  @keyframes scanBar {
+    0% { top: 15%; } 50% { top: 85%; } 100% { top: 15%; }
+  }
+  .face-ring {
+    position: absolute; inset: -4px;
+    border-radius: 50%;
+    border: 3px dashed rgba(243,166,74,0.5);
+    animation: spin 14s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .face-status {
+    font-size: 14px; color: var(--navy-900); font-weight: 600;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .face-status .pulse {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 0 0 rgba(224,138,43,0.6);
+    animation: pulseDot 1.4s ease-out infinite;
+  }
+  @keyframes pulseDot {
+    0% { box-shadow: 0 0 0 0 rgba(224,138,43,0.6); }
+    100% { box-shadow: 0 0 0 10px rgba(224,138,43,0); }
+  }
+  .face-status.done .pulse { background: var(--success); animation: none; }
+  .face-progress {
+    width: 100%; max-width: 280px; height: 5px;
+    background: var(--line); border-radius: 3px; overflow: hidden;
+  }
+  .face-progress span {
+    display: block; height: 100%;
+    background: linear-gradient(90deg, var(--navy-700), var(--accent));
+    width: 0%;
+    transition: width 0.3s ease;
+  }
+
+  /* ---------- STEP 3C: FINGERPRINT ---------- */
+  .fp-stage {
+    display: flex; flex-direction: column; align-items: center;
+    gap: 16px; padding: 10px 0;
+  }
+  .fp-icon {
+    width: 140px; height: 140px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--navy-50), #dfe7f5);
+    border: 2px dashed rgba(26,63,143,0.3);
+    display: grid; place-items: center;
+    position: relative;
+    transition: all 0.3s ease;
+  }
+  .fp-icon.scanning {
+    background: linear-gradient(135deg, var(--navy-700), var(--navy-900));
+    border-color: var(--accent);
+    animation: fpBreath 1.4s ease-in-out infinite;
+  }
+  .fp-icon.done {
+    background: linear-gradient(135deg, var(--success), #3bb878);
+    border-color: var(--success);
+    animation: none;
+  }
+  @keyframes fpBreath {
+    0%,100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(26,63,143,0.4); }
+    50% { transform: scale(1.04); box-shadow: 0 0 0 12px rgba(26,63,143,0); }
+  }
+  .fp-icon svg { width: 70px; height: 70px; color: var(--navy-700); transition: color 0.3s ease; }
+  .fp-icon.scanning svg, .fp-icon.done svg { color: #fff; }
+  .fp-icon .scan-line {
+    position: absolute; left: 15%; right: 15%;
+    top: 50%; height: 2px;
+    background: var(--accent-soft);
+    box-shadow: 0 0 12px var(--accent-soft);
+    opacity: 0;
+    transform: translateY(-50%);
+  }
+  .fp-icon.scanning .scan-line { opacity: 1; animation: fpScan 1.4s ease-in-out infinite; }
+  @keyframes fpScan {
+    0% { top: 20%; } 50% { top: 80%; } 100% { top: 20%; }
+  }
+
+  /* ---------- STEP 4: SUCCESS ---------- */
+  .success-stage {
+    display: flex; flex-direction: column; align-items: center; gap: 16px;
+    padding: 10px 0;
+  }
+  .success-check {
+    width: 84px; height: 84px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--success), #3bb878);
+    display: grid; place-items: center; color: #fff;
+    box-shadow: 0 0 0 6px var(--success-soft), 0 12px 32px -12px var(--success);
+    animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+  @keyframes popIn { from { transform: scale(0.3); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+  .success-check svg { width: 42px; height: 42px; }
+  .success-info {
+    background: var(--success-soft); border: 1px solid #b9e2ca;
+    border-radius: 8px; padding: 12px 14px; width: 100%;
+    font-size: 13px; color: var(--success);
+    display: flex; align-items: flex-start; gap: 8px;
+  }
+  .success-info svg { width: 16px; height: 16px; flex-shrink: 0; margin-top: 1px; }
+
+  .footer {
+    margin-top: 24px; text-align: center;
+    font-size: 11.5px; color: var(--ink-soft); letter-spacing: 0.3px;
+  }
+  .footer .sep { margin: 0 8px; opacity: 0.5; }
+
+  /* responsive */
+  @media (max-width: 960px) {
+    body { grid-template-columns: 1fr; }
+    .brand-panel { padding: 28px 24px; }
+    .sec-features { margin: 20px 0 18px; }
+    .login-panel { padding: 28px 18px 40px; }
+  }
+  @media (max-width: 480px) {
+    .login-card { max-width: 100%; }
+    .logo-wrap img { height: 48px; }
+    .step-title h2 { font-size: 20px; }
+    .otp-inputs input { max-width: 44px; font-size: 18px; border-radius: 8px; }
+    .captcha-row { flex-wrap: wrap; }
+    .captcha-box { width: 100%; order: 1; }
+    .captcha-input { order: 3; width: calc(100% - 54px); }
+    .captcha-refresh { order: 2; width: 44px; }
+    .face-viewport { width: 180px; height: 180px; }
+    .fp-icon { width: 120px; height: 120px; }
+    .fp-icon svg { width: 56px; height: 56px; }
+  }
+
+
+/* ── LOGIN WRAPPER ──────────────────────────────── */
+#login-layer {
+  position: fixed; inset: 0; z-index: 9000;
+  transition: opacity 0.55s ease, transform 0.55s ease;
+}
+#login-layer.fade-out {
+  opacity: 0; transform: scale(1.015); pointer-events: none;
+}
+.login-root {
+  display: grid; grid-template-columns: 1fr 1.05fr;
+  min-height: 100vh;
+  font-family: 'Source Sans 3', system-ui, sans-serif;
+  color: #2c3142; background: #f4f6fa; overflow-x: hidden;
+}
+@media (max-width: 960px) {
+  .login-root { grid-template-columns: 1fr; }
+}
+
+/* ══ APP LAYER STYLES ════════════════════════════ */
+
+/* ══════════════════════════════════════════
+   PraanSetu — Amnex Design System
+   Intelligent Navy #001451 | Blue #0031ff | Purple #a100ff
+   Fonts: Manrope (display) + Inter (body)
+   ══════════════════════════════════════════ */
+:root{
+  /* Amnex brand */
+  --nv:#001451;         /* Intelligent Navy */
+  --nvd:#000a2e;        /* navy-900 */
+  --nvl:#f4f5fa;        /* navy-050 surface */
+  --nv-100:#e4e7f0;
+  --nv-200:#c0c6d9;
+  --bl:#0031ff;         /* Intelligent Blue — primary CTA */
+  --bl-d:#0022b8;
+  --bl-100:#e3e8ff;
+  --pu:#a100ff;         /* Intelligent Purple — accent */
+  --pu-d:#7400b8;
+  --pu-100:#f5e3ff;
+
+  /* Semantic */
+  --sf:#a100ff;         /* accent (was saffron) */
+  --or:#d97706;
+  --gn:#0aa46b;
+  --gn-bg:#e6f7f0;
+  --rd:#dc2626;
+  --rd-bg:#fdecec;
+  --wh:#fff;
+  --gr:#f9fafb;         /* page bg */
+  --gm:#e5e7eb;         /* border-subtle */
+  --gm-2:#cbd5e1;       /* border-default hover */
+  --gd:#6b7280;         /* fg-3 */
+  --tx:#1f2937;         /* body text */
+
+  /* ESI palette — map to Amnex semantics */
+  --e1:#dc2626;         /* Immediate — danger */
+  --e2:#ea580c;         /* Emergent */
+  --e3:#d97706;         /* Urgent — warning */
+  --e4:#0aa46b;         /* Less Urgent — success */
+  --e5:#6b7280;         /* Non-Urgent — neutral */
+
+  --fn:'Inter','Proxima Nova',system-ui,-apple-system,sans-serif;
+  --fs:'Manrope','Aktiv Grotesk',system-ui,sans-serif;
+  --fm:'JetBrains Mono',ui-monospace,Menlo,monospace;
+
+  --r:8px;              /* default card radius */
+  --r-sm:6px;           /* form/button radius */
+  --r-pill:999px;
+
+  --ease:cubic-bezier(.2,.8,.2,1);
+  --sh-sm:0 2px 8px rgba(0,20,81,.06);
+  --sh-md:0 8px 24px rgba(0,20,81,.08);
+  --sh-lg:0 20px 48px rgba(0,20,81,.12);
+  --sh-brand:0 8px 20px rgba(161,0,255,.22);
+
+  --gradient:linear-gradient(135deg,#0031ff 0%,#a100ff 100%);
+
+  --hdr:88px;           /* brandbar(6) + accessbar(30) + header(52) */
+  --nav:48px;
+  --top:136px;          /* hdr + nav */
+}
+/* ── CONTENT SHELL ────────────────────────────── */
+#shell{position:fixed;top:var(--top);left:0;right:0;bottom:0;display:flex;flex-direction:column;overflow:hidden}
+.mp{display:none;flex:1;overflow:hidden;flex-direction:column}
+.mp.on{display:flex}
+.mc{flex:1;overflow-y:auto;padding:24px 28px;background:var(--gr)}
+.mc::-webkit-scrollbar{width:8px}
+.mc::-webkit-scrollbar-track{background:transparent}
+.mc::-webkit-scrollbar-thumb{background:var(--nv-200);border-radius:4px}
+.mc::-webkit-scrollbar-thumb:hover{background:var(--nv-100)}
+
+/* ── CARDS ──────────────────────────────────────── */
+.card{background:#fff;border:1px solid var(--gm);border-radius:var(--r);
+      box-shadow:var(--sh-sm);transition:all var(--ease) .22s;overflow:hidden}
+.card:hover{box-shadow:var(--sh-md);border-color:var(--gm-2)}
+.ch{background:#fff;border-bottom:1px solid var(--gm);padding:14px 18px;
+    display:flex;align-items:center;gap:10px}
+.ch h3{font-size:11px;font-weight:700;color:var(--nv);text-transform:uppercase;letter-spacing:.12em;font-family:var(--fs)}
+.ch span:first-child{display:inline-flex;width:22px;height:22px;align-items:center;justify-content:center;
+  background:var(--pu-100);color:var(--pu-d);border-radius:6px;font-size:12px}
+.cb{padding:18px}
+
+/* ── FORM ───────────────────────────────────────── */
+.fg{margin-bottom:14px}
+.fg label{display:block;font-size:12.5px;font-weight:600;color:var(--nv);margin-bottom:6px;font-family:var(--fs)}
+.fg label .r{color:var(--rd);margin-left:2px}
+.fg input,.fg textarea,.fg select{
+  width:100%;border:1px solid var(--gm-2);border-radius:var(--r-sm);
+  padding:10px 12px;font-family:var(--fn);font-size:13.5px;color:var(--tx);
+  background:#fff;outline:none;transition:all var(--ease) .18s}
+.fg input:focus,.fg textarea:focus,.fg select:focus{
+  border-color:var(--bl);box-shadow:0 0 0 3px var(--bl-100)}
+.fg input::placeholder,.fg textarea::placeholder{color:#9ca3af}
+.fg textarea{resize:none;min-height:80px}
+.hint{font-size:11px;color:var(--gd);margin-top:4px}
+
+/* ── VOICE ──────────────────────────────────────── */
+.vw{position:relative}
+.vw textarea{padding-right:48px}
+.mb2{position:absolute;right:8px;top:8px;width:34px;height:34px;border-radius:50%;
+     border:none;background:var(--gradient);color:#fff;cursor:pointer;
+     display:flex;align-items:center;justify-content:center;font-size:15px;
+     transition:all var(--ease) .2s;z-index:2;box-shadow:var(--sh-brand)}
+.mb2:hover{transform:translateY(-1px);box-shadow:0 10px 24px rgba(161,0,255,.32)}
+.mb2.rec{background:var(--rd);animation:pm .9s infinite}
+@keyframes pm{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.08);opacity:.85}}
+.vs{font-size:11.5px;margin-top:6px;color:var(--gd);min-height:14px;display:flex;align-items:center;gap:5px}
+.vd{width:7px;height:7px;border-radius:50%;background:var(--rd);animation:pm .6s infinite;flex-shrink:0}
+
+/* ── PHOTO UPLOAD ───────────────────────────────── */
+.pz{border:1.5px dashed var(--nv-200);border-radius:var(--r);padding:18px;text-align:center;
+    cursor:pointer;background:var(--nvl);transition:all var(--ease) .22s;position:relative}
+.pz:hover{border-color:var(--bl);background:var(--bl-100)}
+.pz input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.pz .pi{font-size:26px;margin-bottom:4px;color:var(--bl)}
+.pz .pt{font-size:13px;color:var(--nv);font-weight:600;font-family:var(--fs)}
+.pz .ph2{font-size:11px;color:var(--gd);margin-top:3px}
+.pp{display:none;position:relative;margin-top:10px}
+.pp img{width:100%;max-height:120px;object-fit:cover;border-radius:var(--r-sm);border:1px solid var(--gm)}
+.pp .xp{position:absolute;top:6px;right:6px;background:var(--rd);color:#fff;border:none;
+        border-radius:50%;width:22px;height:22px;font-size:13px;cursor:pointer;
+        display:flex;align-items:center;justify-content:center;font-weight:700;box-shadow:var(--sh-sm)}
+.pp .pn{font-size:11px;color:var(--gd);margin-top:5px}
+
+/* ── BUTTONS ─────────────────────────────────────── */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:10px 20px;border-radius:var(--r-pill);
+     border:none;font-family:var(--fs);font-weight:700;font-size:13px;cursor:pointer;
+     transition:all var(--ease) .2s;letter-spacing:.01em;line-height:1}
+.bp{background:var(--bl);color:#fff;box-shadow:0 4px 12px rgba(0,49,255,.22)}
+.bp:hover{background:var(--bl-d);transform:translateY(-1px);box-shadow:0 8px 18px rgba(0,49,255,.3)}
+.bs{background:var(--gradient);color:#fff;box-shadow:var(--sh-brand)}
+.bs:hover{transform:translateY(-1px);box-shadow:0 10px 24px rgba(161,0,255,.32)}
+.bg{background:var(--gn);color:#fff;box-shadow:0 4px 12px rgba(10,164,107,.22)}
+.bg:hover{background:#088856;transform:translateY(-1px)}
+.bd{background:var(--rd);color:#fff;box-shadow:0 4px 12px rgba(220,38,38,.22)}
+.bd:hover{background:#b91c1c;transform:translateY(-1px)}
+.bo{background:#fff;color:var(--nv);border:1px solid var(--gm-2)}
+.bo:hover{background:var(--nvl);border-color:var(--nv);color:var(--nv)}
+.sm{padding:6px 14px;font-size:11.5px}
+.btn:disabled{opacity:.4;cursor:not-allowed;transform:none!important;box-shadow:none!important}
+.bfw{width:100%;justify-content:center}
+
+/* ── ESI BADGE ──────────────────────────────────── */
+.eb{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;
+    border-radius:8px;font-weight:800;font-size:13px;flex-shrink:0;color:#fff;font-family:var(--fs)}
+.e1{background:var(--e1)}
+.e2{background:var(--e2)}
+.e3{background:var(--e3)}
+.e4{background:var(--e4)}
+.e5{background:var(--e5)}
+
+/* ── TABLE ──────────────────────────────────────── */
+.gt{width:100%;border-collapse:collapse;font-size:13px;background:#fff}
+.gt th{background:var(--nvl);color:var(--nv);padding:11px 14px;text-align:left;
+       font-weight:700;font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;
+       position:sticky;top:0;z-index:1;font-family:var(--fs);border-bottom:1px solid var(--gm)}
+.gt td{padding:12px 14px;border-bottom:1px solid var(--gm);vertical-align:middle}
+.gt tr:last-child td{border-bottom:none}
+.gt tr:hover td{background:var(--nvl)}
+.gt tr.flg td{background:#fff8e5!important;box-shadow:inset 3px 0 0 var(--pu)}
+.gt tr.crt td{background:#fdecec!important;box-shadow:inset 3px 0 0 var(--rd)}
+
+/* ── TAG ─────────────────────────────────────────── */
+.tag{display:inline-block;padding:3px 10px;border-radius:var(--r-pill);font-size:11px;
+     font-weight:600;letter-spacing:.02em;font-family:var(--fn)}
+.tcr{background:var(--rd-bg);color:#991b1b}
+.trv{background:#fff4e5;color:#92400e}
+.tok{background:var(--gn-bg);color:#047857}
+.tin{background:var(--bl-100);color:var(--bl-d)}
+.tdn{background:var(--gn-bg);color:#047857}
+.tfl{background:var(--pu-100);color:var(--pu-d);animation:fb 1.8s infinite}
+@keyframes fb{0%,100%{background:var(--pu-100)}50%{background:#ecc6ff}}
+
+/* ── STAT CARD ──────────────────────────────────── */
+.sg{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:14px;margin-bottom:18px}
+.sc{background:#fff;border:1px solid var(--gm);border-radius:var(--r);padding:16px 18px;
+    position:relative;overflow:hidden;transition:all var(--ease) .22s}
+.sc:hover{box-shadow:var(--sh-md);border-color:var(--gm-2)}
+.sc::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--bl)}
+.sc.o::before{background:var(--pu)}
+.sc.g::before{background:var(--gn)}
+.sc.r::before{background:var(--rd)}
+.sv{font-size:28px;font-weight:800;color:var(--nv);font-family:var(--fs);line-height:1;letter-spacing:-.02em}
+.sv.o{color:var(--pu)}.sv.g{color:var(--gn)}.sv.r{color:var(--rd)}
+.sl{font-size:11px;color:var(--gd);margin-top:6px;text-transform:uppercase;letter-spacing:.06em;font-weight:600;font-family:var(--fs)}
+
+/* ── ALERT ───────────────────────────────────────── */
+.al{padding:12px 16px;border-radius:var(--r-sm);margin-bottom:14px;font-size:13px;
+    display:flex;align-items:flex-start;gap:8px;line-height:1.5}
+.aok{background:var(--gn-bg);color:#065f46;border:1px solid #a7e3c9}
+.aw{background:#fff4e5;color:#92400e;border:1px solid #fcd9b0}
+.aer{background:var(--rd-bg);color:#991b1b;border:1px solid #f5b5b5}
+.ain{background:var(--bl-100);color:var(--bl-d);border:1px solid #b8c5ff}
+
+/* ── GRID ────────────────────────────────────────── */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+
+/* ── MODAL ───────────────────────────────────────── */
+.mbd{display:none;position:fixed;inset:0;background:rgba(0,10,46,.55);z-index:500;
+     align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.mbd.open{display:flex}
+.mo{background:#fff;border-radius:12px;width:560px;max-width:96vw;
+    box-shadow:var(--sh-lg);max-height:90vh;display:flex;flex-direction:column;overflow:hidden}
+.moh{background:#fff;padding:16px 20px;border-bottom:1px solid var(--gm);
+     display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.moh h3{font-size:15px;font-weight:700;color:var(--nv);font-family:var(--fs);letter-spacing:-.01em}
+.mox{background:none;border:none;font-size:22px;cursor:pointer;color:var(--gd);line-height:1;padding:0 4px;border-radius:6px;transition:all .15s}
+.mox:hover{background:var(--nvl);color:var(--nv)}
+.mob{padding:20px;overflow-y:auto;flex:1}
+.mof{padding:14px 20px;border-top:1px solid var(--gm);display:flex;justify-content:flex-end;
+     gap:10px;background:var(--nvl);flex-shrink:0}
+
+/* ── QUEUE NUM ───────────────────────────────────── */
+.qn{font-family:var(--fs);font-size:48px;font-weight:800;color:transparent;line-height:1;
+    background:var(--gradient);-webkit-background-clip:text;background-clip:text;letter-spacing:-.03em}
+
+/* ── CONF BAR ────────────────────────────────────── */
+.cw{font-size:12px;color:var(--gd);font-weight:500}
+.ct{height:6px;background:var(--nv-100);border-radius:3px;margin-top:4px;overflow:hidden}
+.cf{height:100%;border-radius:3px;transition:width .6s var(--ease)}
+
+/* ── HANDOFF ─────────────────────────────────────── */
+.hb{background:var(--nv);color:#e4e7f0;border-radius:var(--r-sm);padding:16px;
+    font-family:var(--fm);font-size:11.5px;white-space:pre-wrap;line-height:1.7;
+    max-height:340px;overflow-y:auto;border:1px solid var(--nvd)}
+
+/* ── NOTICE ──────────────────────────────────────── */
+.nb{background:#fff;border:1px solid var(--gm);border-left:3px solid var(--pu);
+    padding:11px 16px;font-size:12.5px;color:var(--nv);display:flex;align-items:center;
+    gap:10px;margin-bottom:16px;border-radius:var(--r-sm);box-shadow:var(--sh-sm)}
+.nb strong{color:var(--nv);font-weight:700}
+
+/* ── REF TAG ─────────────────────────────────────── */
+.rt{font-family:var(--fm);font-size:16px;font-weight:600;color:var(--nv);
+    letter-spacing:.08em;background:var(--nvl);padding:7px 14px;border-radius:var(--r-sm);
+    border:1px solid var(--gm);display:inline-block}
+
+/* ── VITALS ──────────────────────────────────────── */
+.vg{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.vi{background:var(--nvl);border:1px solid var(--gm);border-radius:var(--r-sm);padding:10px 13px}
+.vl{font-size:10px;color:var(--gd);text-transform:uppercase;letter-spacing:.08em;font-weight:600;font-family:var(--fs)}
+.vv{font-size:18px;font-weight:700;color:var(--nv);font-family:var(--fs);line-height:1.2;margin-top:2px}
+.vu{font-size:11px;color:var(--gd)}
+
+/* ── DOCTOR ROW ──────────────────────────────────── */
+.dr{display:flex;align-items:center;gap:11px;padding:10px 0;border-bottom:1px solid var(--gm)}
+.dr:last-child{border-bottom:none}
+.dav{width:36px;height:36px;border-radius:50%;background:var(--gradient);color:#fff;
+     display:flex;align-items:center;justify-content:center;font-weight:700;font-size:11.5px;
+     flex-shrink:0;font-family:var(--fs)}
+.dn{font-size:13px;font-weight:600;color:var(--nv);font-family:var(--fs)}
+.ds{font-size:11.5px;color:var(--gd)}
+.dl{font-size:11.5px;font-weight:600;color:var(--pu);margin-left:auto;
+    background:var(--pu-100);padding:3px 10px;border-radius:var(--r-pill)}
+
+/* ── FORECAST ────────────────────────────────────── */
+.fp{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.fi{text-align:center;padding:18px 14px;background:var(--nvl);border:1px solid var(--gm);border-radius:var(--r-sm)}
+.fn2{font-size:34px;font-weight:800;color:transparent;font-family:var(--fs);
+     background:var(--gradient);-webkit-background-clip:text;background-clip:text;letter-spacing:-.02em;line-height:1}
+.fl{font-size:11px;text-transform:uppercase;color:var(--gd);letter-spacing:.06em;font-weight:600;margin-top:8px;font-family:var(--fs)}
+
+/* ── ESI DIST ────────────────────────────────────── */
+.edr{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.edb{flex:1;height:8px;background:var(--nv-100);border-radius:4px;overflow:hidden}
+.edf{height:100%;border-radius:4px;transition:width .5s var(--ease)}
+.edc{font-size:13px;font-weight:700;color:var(--nv);min-width:18px;text-align:right;font-family:var(--fs)}
+
+/* ── TABS ────────────────────────────────────────── */
+.tbr{display:flex;border-bottom:1px solid var(--gm);margin-bottom:18px;flex-wrap:wrap;gap:4px}
+.tb{background:none;border:none;padding:10px 16px;font-family:var(--fs);font-size:13px;
+    font-weight:600;cursor:pointer;color:var(--gd);border-bottom:2px solid transparent;
+    margin-bottom:-1px;transition:all var(--ease) .2s}
+.tb.on{color:var(--nv);border-bottom-color:var(--pu)}
+.tb:hover{color:var(--nv)}
+.tp{display:none}.tp.on{display:block}
+
+/* ── UTILITY BAR ─────────────────────────────────── */
+.ub{background:#fff;border:1px solid var(--gm);border-radius:var(--r);
+    padding:12px 16px;display:flex;align-items:center;justify-content:space-between;
+    margin-bottom:16px;font-size:12.5px;color:var(--tx);flex-wrap:wrap;gap:10px;box-shadow:var(--sh-sm)}
+.ua{display:flex;gap:8px;flex-wrap:wrap}
+
+/* ── FILTER BAR ──────────────────────────────────── */
+.fb2{background:#fff;border:1px solid var(--gm);border-radius:var(--r);
+     padding:12px 16px;margin-bottom:16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;box-shadow:var(--sh-sm)}
+.fb2 label{font-size:12px;font-weight:600;color:var(--nv);font-family:var(--fs)}
+.fb2 input,.fb2 select{border:1px solid var(--gm-2);border-radius:var(--r-sm);padding:6px 10px;
+    font-family:var(--fn);font-size:12.5px;background:#fff;color:var(--tx)}
+.fb2 input:focus,.fb2 select:focus{border-color:var(--bl);outline:none;box-shadow:0 0 0 3px var(--bl-100)}
+
+/* ── SAMPLE PROMPT ───────────────────────────────── */
+.sp{background:var(--nvl);border:1px solid var(--gm);border-radius:var(--r-pill);
+    padding:7px 14px;font-size:12.5px;color:var(--nv);cursor:pointer;
+    transition:all var(--ease) .2s;margin-bottom:6px;font-weight:500;display:inline-block;margin-right:6px}
+.sp:hover{background:var(--pu-100);border-color:var(--pu);color:var(--pu-d)}
+
+/* ── TICKER ──────────────────────────────────────── */
+.tk{font-size:12px;color:var(--gd);display:flex;align-items:center;gap:6px;font-weight:500}
+.tkd{width:8px;height:8px;border-radius:50%;background:var(--gn);animation:pm 1s infinite}
+
+/* ── FLAGGED PANEL ───────────────────────────────── */
+.fp2{background:#fff;border:1px solid var(--gm);border-left:3px solid var(--pu);
+     border-radius:var(--r);padding:14px 18px;margin-bottom:16px;display:none;box-shadow:var(--sh-sm)}
+.fp2 .fph{font-size:12px;font-weight:700;color:var(--pu-d);margin-bottom:10px;
+          display:flex;align-items:center;gap:8px;text-transform:uppercase;letter-spacing:.08em;font-family:var(--fs)}
+.fp2 .fpi{display:flex;align-items:center;gap:10px;padding:8px 0;
+          border-bottom:1px solid var(--gm);font-size:12.5px}
+.fp2 .fpi:last-child{border-bottom:none}
+
+/* ── WAIT BADGE ──────────────────────────────────── */
+.wb{background:var(--nvl);border:1px solid var(--gm);border-radius:var(--r-pill);
+    padding:4px 12px;font-size:11.5px;color:var(--nv);display:inline-flex;align-items:center;gap:6px;margin-top:6px;font-weight:500}
+
+/* ── ESI SCALE ROWS ──────────────────────────────── */
+.er{display:flex;align-items:center;gap:11px;padding:9px 0;border-bottom:1px solid var(--gm)}
+.er:last-child{border-bottom:none}
+
+/* ── SPIN ────────────────────────────────────────── */
+.spin{width:32px;height:32px;border:3px solid var(--nv-100);border-top-color:var(--pu);
+      border-radius:50%;animation:sp .6s linear infinite;margin:30px auto}
+@keyframes sp{to{transform:rotate(360deg)}}
+
+/* ── SCROLLABLE TABLE WRAPPER ────────────────────── */
+.tw{overflow-x:auto;overflow-y:auto;max-height:calc(100vh - var(--top) - 240px);border-radius:0 0 var(--r) var(--r)}
+.tw::-webkit-scrollbar{height:8px;width:8px}
+.tw::-webkit-scrollbar-thumb{background:var(--nv-200);border-radius:4px}
+
+/* Emoji icons inline — neutralize size */
+.ch span:first-child{font-size:12px}
+
+/* hide old default chevron on select */
+.fg select{appearance:none;-webkit-appearance:none;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'><path fill='none' stroke='%236b7280' stroke-width='2' d='M1 1l5 5 5-5'/></svg>");
+  background-repeat:no-repeat;background-position:right 12px center;padding-right:34px}
+
+/* Confirmation success banner override */
+.al.aok strong{font-weight:700}
+html,body{height:100%;overflow:hidden;font-family:var(--fn);font-size:14px;color:var(--tx);background:var(--gr);-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+
+/* ── FIXED CHROME ─────────────────────────────── */
+#chrome{position:fixed;top:0;left:0;right:0;z-index:200;background:#fff}
+
+/* BRAND ACCENT BAR — blue→purple gradient */
+.tri{height:4px;background:var(--gradient)}
+
+/* ACCESS BAR — quiet utility strip */
+.ab{background:var(--nvl);border-bottom:1px solid var(--gm);height:30px;
+    display:flex;align-items:center;justify-content:space-between;padding:0 24px;font-size:12px;color:var(--gd)}
+.abl,.abr{display:flex;align-items:center;gap:10px}
+.ax{background:transparent;border:1px solid var(--gm-2);border-radius:var(--r-pill);
+    padding:2px 10px;font-size:11.5px;cursor:pointer;font-family:var(--fn);color:var(--nv);
+    font-weight:500;transition:all var(--ease) .2s}
+.ax:hover,.ax.on{background:var(--nv);color:#fff;border-color:var(--nv)}
+.ab a{color:var(--bl);text-decoration:none;font-weight:500}
+.ab a:hover{text-decoration:underline}
+
+/* HEADER — Amnex branding */
+.hd{background:#fff;height:52px;display:flex;align-items:center;padding:0 24px;gap:16px;
+    border-bottom:1px solid var(--gm)}
+.emb{width:38px;height:38px;background:var(--gradient);border-radius:10px;
+     display:flex;align-items:center;justify-content:center;flex-shrink:0;
+     box-shadow:var(--sh-brand);color:#fff;font-weight:800;font-size:17px;
+     font-family:var(--fs);letter-spacing:-.02em}
+.ht{flex:1;display:flex;align-items:baseline;gap:14px;min-width:0}
+.ht h1{font-size:18px;color:var(--nv);font-weight:800;font-family:var(--fs);line-height:1;
+       letter-spacing:-.02em;white-space:nowrap}
+.ht .sub{font-size:11.5px;color:var(--gd);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ht .pill{display:inline-block;background:var(--pu-100);color:var(--pu-d);
+          font-size:10.5px;font-weight:700;padding:2px 9px;border-radius:var(--r-pill);
+          letter-spacing:.06em;text-transform:uppercase;flex-shrink:0}
+.lg{display:flex;gap:4px;background:var(--nvl);padding:3px;border-radius:var(--r-pill)}
+.lb{background:transparent;border:none;color:var(--gd);
+    padding:4px 12px;border-radius:var(--r-pill);font-size:12px;cursor:pointer;
+    font-family:var(--fn);font-weight:600;transition:all var(--ease) .2s}
+.lb:hover{color:var(--nv)}
+.lb.on{background:#fff;color:var(--nv);box-shadow:var(--sh-sm)}
+
+/* NAV — clean tabs */
+.nv{background:#fff;height:48px;display:flex;align-items:stretch;padding:0 16px;
+    border-bottom:1px solid var(--gm);gap:2px}
+.nv button{background:none;border:none;color:var(--gd);padding:0 18px;font-family:var(--fn);
+    font-size:13.5px;font-weight:600;cursor:pointer;transition:all var(--ease) .2s;
+    display:flex;align-items:center;gap:7px;position:relative;white-space:nowrap;
+    border-bottom:2px solid transparent;margin-bottom:-1px}
+.nv button:hover{color:var(--nv)}
+.nv button.on{color:var(--nv);border-bottom-color:var(--pu)}
+.nv button .dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--gn);margin-left:4px;animation:pm 1.6s infinite}
+
+
+/* ── CONFIRM PANEL SCROLL ────────────────────────── */
+.conf-scroll{overflow-y:auto;max-height:calc(100vh - var(--top) - 20px)}
+
+
+#app-layer {
+  position: fixed; inset: 0; z-index: 1;
+  display: none; opacity: 0;
+  transition: opacity 0.55s ease;
+}
+#app-layer.visible { display: block; opacity: 1; }
+
+/* ══ TRANSITION SPLASH ═══════════════════════════ */
+#launch-splash {
+  position: fixed; inset: 0; z-index: 9500;
+  background: linear-gradient(135deg,#001451 0%,#0031ff 55%,#a100ff 100%);
+  display: flex; align-items: center; justify-content: center;
+  flex-direction: column; gap: 20px;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.35s ease;
+}
+#launch-splash.show { opacity: 1; pointer-events: all; }
+#launch-splash.hide { opacity: 0; pointer-events: none; }
+.splash-logo {
+  width: 68px; height: 68px; border-radius: 18px;
+  background: rgba(255,255,255,0.12);
+  border: 1.5px solid rgba(255,255,255,0.22);
+  display: flex; align-items: center; justify-content: center;
+  color: #fff; font-size: 30px; font-weight: 800;
+  font-family: 'Manrope', sans-serif;
+  animation: splashPop 0.5s cubic-bezier(.175,.885,.32,1.275) both;
+}
+@keyframes splashPop {
+  from { transform: scale(0.3); opacity: 0; }
+  to   { transform: scale(1);   opacity: 1; }
+}
+.splash-brand {
+  color: #fff; font-family: 'Manrope', sans-serif;
+  font-size: 22px; font-weight: 800; letter-spacing: -.02em;
+}
+.splash-sub {
+  color: rgba(255,255,255,0.65);
+  font-family: 'Inter', sans-serif;
+  font-size: 12px; letter-spacing: .12em; text-transform: uppercase;
+  margin-top: -12px;
+}
+.splash-bar {
+  width: 220px; height: 3px;
+  background: rgba(255,255,255,0.15); border-radius: 2px; overflow: hidden;
+}
+.splash-bar-fill {
+  height: 100%; width: 0%; background: #fff; border-radius: 2px;
+  animation: splashLoad 1.1s ease forwards 0.15s;
+}
+@keyframes splashLoad { from{ width:0% } to{ width:100% } }
+</style>
+</head>
+<body style="margin:0;padding:0;overflow:hidden;background:#001451">
+
+<!-- ════════════ LOGIN LAYER ════════════ -->
+<div id="login-layer" role="main">
+  <div class="login-root">
+<!-- LEFT BRAND PANEL -->
+  <aside class="brand-panel">
+    <div class="grid-dots"></div>
+    <div class="ecg" aria-hidden="true">
+      <svg viewBox="0 0 1200 80" preserveAspectRatio="none">
+        <path d="M0,40 L150,40 L180,40 L195,20 L210,60 L225,10 L240,70 L260,40 L420,40 L450,40 L465,25 L480,55 L495,15 L510,65 L525,40 L700,40 L730,40 L745,18 L760,62 L775,8 L790,72 L810,40 L1000,40 L1030,40 L1045,25 L1060,55 L1075,15 L1090,65 L1110,40 L1200,40" />
+      </svg>
+    </div>
+
+    <div class="brand-top">
+      <div class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 22s-8-4.5-8-11.8A5.2 5.2 0 0 1 12 5a5.2 5.2 0 0 1 8 5.2C20 17.5 12 22 12 22z"/>
+          <path d="M3.5 12.5h4L10 8l4 9 2.5-4.5h4"/>
+        </svg>
+      </div>
+      <div class="brand-name">PraanSetu <span>•</span> Secure Portal</div>
+    </div>
+
+    <div class="brand-hero">
+      <span class="eyebrow">Zero Trust Access</span>
+      <h1>Multi-factor by <em>design</em>, not as an afterthought.</h1>
+      <p>Every sign-in is verified across knowledge, possession, and biometric factors — because healthcare data deserves defense in depth.</p>
+    </div>
+
+    <div class="sec-features">
+      <div class="sec-item">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+        <div><strong>Password + CAPTCHA</strong> — bot-resistant first factor</div>
+      </div>
+      <div class="sec-item">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg></div>
+        <div><strong>OTP Authentication</strong> — time-bound 6-digit codes</div>
+      </div>
+      <div class="sec-item">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 0 1 10 10c0 3.5-1.8 6.6-4.5 8.4"/><path d="M8 20.9A10 10 0 0 1 2 12a10 10 0 0 1 4-8"/><circle cx="12" cy="11" r="3"/><path d="M8 19c0-2 1.8-4 4-4s4 2 4 4"/></svg></div>
+        <div><strong>Facial Recognition</strong> — liveness-verified match</div>
+      </div>
+      <div class="sec-item">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 11c0 4-1 7-4 10"/><path d="M8 15c0 2-1 4-2 5"/><path d="M16 11a4 4 0 0 0-8 0c0 4-1 7-3 10"/><path d="M12 6a8 8 0 0 1 8 8c0 3-1 5-2 7"/></svg></div>
+        <div><strong>Biometric (Fingerprint)</strong> — WebAuthn passwordless</div>
+      </div>
+    </div>
+
+    <div class="brand-foot">
+      <span class="dot"></span>
+      ISO 27001 • HIPAA-aligned • End-to-end encrypted
+    </div>
+  </aside>
+
+  <!-- RIGHT LOGIN PANEL -->
+  <main class="login-panel">
+    <div class="login-card">
+
+      <div class="logo-wrap">
+        <img src="data:image/jpeg;base64,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" alt="PraanSetu Logo" />
+      </div>
+
+      <!-- progress stepper -->
+      <div class="stepper" id="stepper">
+        <div class="s active" data-s="1"><span class="num">1</span><span class="lbl">Credentials</span></div>
+        <div class="bar"></div>
+        <div class="s" data-s="2"><span class="num">2</span><span class="lbl">Method</span></div>
+        <div class="bar"></div>
+        <div class="s" data-s="3"><span class="num">3</span><span class="lbl">Verify</span></div>
+      </div>
+
+      <div class="steps">
+
+        <!-- ===== STEP 1: CREDENTIALS + CAPTCHA ===== -->
+        <div class="step active" data-step="1">
+          <div class="step-title"><h2>Sign In Securely</h2></div>
+          <p class="step-sub">Enter your credentials and verify you're human.</p>
+
+          <form id="loginForm" novalidate class="step-body">
+            <div class="alert error" id="alertBox1" role="alert">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              <span id="alertMsg1">Please fix the errors below.</span>
+            </div>
+
+            <div style="display:flex;justify-content:flex-end;">
+              <span class="attempts-badge ok" id="attemptsBadge">
+                <span class="dot"></span>
+                <span id="attemptsText">3 attempts remaining</span>
+              </span>
+            </div>
+
+            <div class="field">
+              <label for="loginId">Login ID</label>
+              <div class="input-wrap">
+                <input type="text" id="loginId" placeholder="e.g. N00041 or user@domain.com" autocomplete="username" />
+                <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="password">Password</label>
+              <div class="input-wrap">
+                <input type="password" id="password" placeholder="Enter your password" autocomplete="current-password" />
+                <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                <button type="button" class="pw-toggle" id="pwToggle" aria-label="Show password">
+                  <svg id="eyeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                </button>
+              </div>
+              <div class="pw-strength" id="pwStrength" style="display:none;">
+                <div class="pw-bars"><span></span><span></span><span></span><span></span></div>
+                <div class="pw-label" id="pwLabel">Weak</div>
+              </div>
+            </div>
+
+            <div class="field">
+              <label>Security CAPTCHA</label>
+              <div class="captcha-row">
+                <div class="captcha-box"><canvas id="captchaCanvas" width="150" height="42"></canvas></div>
+                <button type="button" class="captcha-refresh" id="captchaRefresh" aria-label="Refresh CAPTCHA" title="Refresh">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+                </button>
+                <input type="text" class="captcha-input" id="captchaInput" placeholder="Enter code" maxlength="5" />
+              </div>
+            </div>
+
+            <div class="row">
+              <label class="check">
+                <input type="checkbox" id="trustDevice" />
+                <span class="box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+                Trust this device for 30 days
+              </label>
+              <a href="#" class="forgot">Forgot password?</a>
+            </div>
+
+            <button type="submit" class="btn-primary">
+              Continue
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </button>
+          </form>
+        </div>
+
+        <!-- ===== STEP 2: CHOOSE 2FA METHOD ===== -->
+        <div class="step" data-step="2">
+          <div class="step-title"><h2>Choose Verification Method</h2></div>
+          <p class="step-sub">Select how you'd like to complete two-factor authentication.</p>
+
+          <div class="step-body">
+            <div class="methods" id="methods">
+
+              <div class="method selected" data-method="otp">
+                <div class="m-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg></div>
+                <div class="m-body">
+                  <div class="m-title">OTP via SMS / Email <span class="m-tag rec">Recommended</span></div>
+                  <div class="m-sub">6-digit code sent to +91 •••••234 / k•••@amnex.com</div>
+                </div>
+                <div class="m-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+              </div>
+
+              <div class="method" data-method="face">
+                <div class="m-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 0 1 10 10c0 3.5-1.8 6.6-4.5 8.4"/><path d="M8 20.9A10 10 0 0 1 2 12a10 10 0 0 1 4-8"/><circle cx="12" cy="11" r="3"/><path d="M8 19c0-2 1.8-4 4-4s4 2 4 4"/></svg></div>
+                <div class="m-body">
+                  <div class="m-title">Facial Recognition</div>
+                  <div class="m-sub">Uses your device camera with liveness detection</div>
+                </div>
+                <div class="m-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+              </div>
+
+              <div class="method" data-method="bio">
+                <div class="m-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 21c-1-3-1-6 0-9 1-4 4-6 6-6s5 2 6 6c1 3 1 6 0 9"/><path d="M9 21c-1-3-1-5 0-8 .6-1.8 2-3 3-3s2.4 1.2 3 3c1 3 1 5 0 8"/><path d="M12 9v13"/></svg></div>
+                <div class="m-body">
+                  <div class="m-title">Fingerprint / Biometric</div>
+                  <div class="m-sub">WebAuthn-based, passwordless, device-bound</div>
+                </div>
+                <div class="m-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+              </div>
+
+              <div class="method" data-method="combo">
+                <div class="m-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 11 12 14 17 9"/></svg></div>
+                <div class="m-body">
+                  <div class="m-title">OTP + Biometric <span class="m-tag">High Security</span></div>
+                  <div class="m-sub">Two verifications required — for privileged access</div>
+                </div>
+                <div class="m-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+              </div>
+
+            </div>
+
+            <div class="btn-row">
+              <button type="button" class="btn-ghost" data-back="1">Back</button>
+              <button type="button" class="btn-primary" id="methodContinue">
+                Continue
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== STEP 3A: OTP ===== -->
+        <div class="step" data-step="3" data-sub="otp">
+          <div class="step-title"><h2>Enter OTP</h2></div>
+          <p class="step-sub">We've sent a 6-digit code to your registered contact.</p>
+
+          <div class="step-body">
+            <div class="otp-info">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+              Code sent to <strong>+91 •••••234</strong> & <strong>k•••@amnex.com</strong>
+            </div>
+
+            <div class="alert error" id="alertBoxOtp" role="alert">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              <span id="alertMsgOtp">Invalid OTP. Try again.</span>
+            </div>
+
+            <div class="otp-inputs" id="otpInputs">
+              <input type="text" inputmode="numeric" maxlength="1" />
+              <input type="text" inputmode="numeric" maxlength="1" />
+              <input type="text" inputmode="numeric" maxlength="1" />
+              <input type="text" inputmode="numeric" maxlength="1" />
+              <input type="text" inputmode="numeric" maxlength="1" />
+              <input type="text" inputmode="numeric" maxlength="1" />
+            </div>
+
+            <div class="otp-timer">
+              Code expires in <strong id="otpTimer">02:00</strong> —
+              <a href="#" id="otpResend" class="disabled">Resend code</a>
+            </div>
+
+            <div class="btn-row">
+              <button type="button" class="btn-ghost" data-back="2">Back</button>
+              <button type="button" class="btn-primary" id="otpVerify">
+                Verify & Sign In
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== STEP 3B: FACIAL ===== -->
+        <div class="step" data-step="3" data-sub="face">
+          <div class="step-title"><h2>Facial Verification</h2></div>
+          <p class="step-sub">Position your face within the frame. Ensure good lighting.</p>
+
+          <div class="step-body">
+            <div class="alert warn" id="alertBoxFace" role="alert">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+              <span id="alertMsgFace">Camera access is required. Please allow it when prompted.</span>
+            </div>
+
+            <div class="face-stage">
+              <div class="face-viewport">
+                <div class="face-ring"></div>
+                <video id="faceVideo" autoplay playsinline muted></video>
+                <div class="placeholder" id="facePlaceholder">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="11" r="4"/><path d="M8 19c0-2 1.8-4 4-4s4 2 4 4"/><path d="M4 8V6a2 2 0 0 1 2-2h2"/><path d="M20 8V6a2 2 0 0 0-2-2h-2"/><path d="M4 16v2a2 2 0 0 0 2 2h2"/><path d="M20 16v2a2 2 0 0 1-2 2h-2"/></svg>
+                </div>
+                <div class="face-scan"></div>
+              </div>
+
+              <div class="face-status" id="faceStatus"><span class="pulse"></span><span id="faceStatusText">Preparing camera…</span></div>
+              <div class="face-progress"><span id="faceProgress"></span></div>
+            </div>
+
+            <div class="btn-row">
+              <button type="button" class="btn-ghost" data-back="2">Back</button>
+              <button type="button" class="btn-primary" id="faceStart">
+                Start Scan
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== STEP 3C: BIOMETRIC ===== -->
+        <div class="step" data-step="3" data-sub="bio">
+          <div class="step-title"><h2>Biometric Verification</h2></div>
+          <p class="step-sub" id="bioSub">Touch your device's fingerprint sensor to continue.</p>
+
+          <div class="step-body">
+            <div class="alert warn" id="alertBoxBio" role="alert">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              <span id="alertMsgBio">Use a device with a registered fingerprint or Windows Hello / Touch ID.</span>
+            </div>
+
+            <div class="fp-stage">
+              <div class="fp-icon" id="fpIcon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M6 21c-1-3-1-6 0-9 1-4 4-6 6-6s5 2 6 6c1 3 1 6 0 9"/>
+                  <path d="M9 21c-1-3-1-5 0-8 .6-1.8 2-3 3-3s2.4 1.2 3 3c1 3 1 5 0 8"/>
+                  <path d="M12 9v13"/>
+                  <path d="M4 10c1-3 4-6 8-6s7 3 8 6"/>
+                </svg>
+                <span class="scan-line"></span>
+              </div>
+              <div class="face-status" id="fpStatus"><span class="pulse"></span><span id="fpStatusText">Waiting for sensor…</span></div>
+            </div>
+
+            <div class="btn-row">
+              <button type="button" class="btn-ghost" data-back="2">Back</button>
+              <button type="button" class="btn-primary" id="fpStart">
+                Authenticate
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== STEP 4: SUCCESS ===== -->
+        <div class="step" data-step="4">
+          <div class="step-title"><h2>Access Granted</h2></div>
+          <p class="step-sub">You've been authenticated successfully.</p>
+
+          <div class="step-body">
+            <div class="success-stage">
+              <div class="success-check">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+              <div class="success-info">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>
+                <div>
+                  <strong>Session initiated:</strong> <span id="sessionTime">—</span><br/>
+                  <strong>Verified via:</strong> <span id="verifiedVia">—</span><br/>
+                  Redirecting to your dashboard…
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="footer">
+        © 2026 PraanSetu Healthcare
+        <span class="sep">•</span>
+        <a href="#" style="color:inherit;text-decoration:none;">Privacy</a>
+        <span class="sep">•</span>
+        <a href="#" style="color:inherit;text-decoration:none;">Terms</a>
+        <span class="sep">•</span>
+        v2.0.0
+      </div>
+    </div>
+  </main>
+  </div>
+</div>
+
+<!-- ════════════ TRANSITION SPLASH ════════════ -->
+<div id="launch-splash" role="status" aria-live="polite" aria-label="Loading application">
+  <div class="splash-logo">P</div>
+  <div class="splash-brand">PraanSetu</div>
+  <div class="splash-sub">AI Patient Triage · Amnex</div>
+  <div class="splash-bar"><div class="splash-bar-fill"></div></div>
+</div>
+
+<!-- ════════════ APP LAYER ════════════ -->
+<div id="app-layer" aria-hidden="true">
+<!-- ══════════════ FIXED CHROME ══════════════ -->
+<div id="chrome">
+  <!-- BRAND ACCENT -->
+  <div class="tri"></div>
+
+  <!-- ACCESS BAR -->
+  <div class="ab">
+    <div class="abl">
+      <span>Accessibility:</span>
+      <div style="display:flex;align-items:center;gap:4px">
+        <span style="font-size:10.5px">Text:</span>
+        <button class="ax" onclick="fs('sm')">A-</button>
+        <button class="ax on" onclick="fs('md')">A</button>
+        <button class="ax" onclick="fs('lg')">A+</button>
+      </div>
+      <button class="ax" id="hcbtn" onclick="hct()">High Contrast</button>
+      <button class="ax">&#9650; Screen Reader</button>
+    </div>
+    <div class="abr">
+      <span>&#9432; SARJAN 2026 | UC01</span>
+      <span>|</span><a href="#" style="font-size:11px">Help</a>
+      <span>|</span><a href="#" style="font-size:11px">Sitemap</a>
+    </div>
+  </div>
+
+  <!-- HEADER — Amnex branding -->
+  <div class="hd">
+    <div class="emb">P</div>
+    <div class="ht">
+      <h1>PraanSetu</h1>
+      <span class="pill">UC01 · Triage</span>
+      <div class="sub">AI-Powered Patient Triage &amp; ER Queue Optimizer &nbsp;·&nbsp; SARJAN 2026 &nbsp;·&nbsp; Amnex Infotechnologies, Ahmedabad</div>
+    </div>
+    <div class="lg">
+      <button class="lb on" onclick="setL('en',this)">English</button>
+      <button class="lb" onclick="setL('hi',this)">हिन्दी</button>
+    </div>
+  </div>
+
+  <!-- MAIN NAV -->
+  <nav class="nv">
+    <button class="on" onclick="go('pat')" id="n-pat">Patient Registration</button>
+    <button onclick="go('sts')" id="n-sts">Check Status</button>
+    <button onclick="go('nrs')" id="n-nrs">Nurse Console <span class="dot"></span></button>
+    <button onclick="go('adm')" id="n-adm">Admin Dashboard</button>
+  </nav>
+</div>
+<!-- END CHROME -->
+
+<!-- ══════════════ CONTENT SHELL ══════════════ -->
+<div id="shell">
+
+  <!-- ════════════════════════════════════
+       MODULE 1 — PATIENT REGISTRATION
+       ════════════════════════════════════ -->
+  <div id="m-pat" class="mp on">
+    <div class="mc">
+
+      <!-- REGISTRATION FORM -->
+      <div id="reg-form">
+        <div class="nb">&#9888; <span><strong>Note:</strong> For life-threatening emergencies, alert reception immediately. This system is assistive, not a replacement for clinical judgment.</span></div>
+        <div class="g2">
+          <!-- LEFT -->
+          <div>
+            <div class="card" style="margin-bottom:12px">
+              <div class="ch"><span>&#128100;</span><h3>Patient Details (FR-01-1)</h3></div>
+              <div class="cb">
+                <div class="g2" style="gap:10px">
+                  <div class="fg"><label>Full Name <span class="r">*</span></label>
+                    <input id="pn" placeholder="e.g. Ramesh Kumar"/></div>
+                  <div class="fg"><label>Age <span class="r">*</span></label>
+                    <input type="number" id="pa" placeholder="45" min="0" max="120"/></div>
+                </div>
+                <div class="fg"><label>Mobile Number <span class="r">*</span></label>
+                  <input type="tel" id="pc" placeholder="+91 98765 43210"/></div>
+                <div class="g2" style="gap:10px;margin-bottom:0">
+                  <div class="fg" style="margin-bottom:0"><label>Gender</label>
+                    <select id="pg"><option value="">-- Select --</option>
+                      <option>Male</option><option>Female</option><option>Other</option></select></div>
+                  <div class="fg" style="margin-bottom:0"><label>Blood Group</label>
+                    <select><option value="">-- Unknown --</option>
+                      <option>A+</option><option>A-</option><option>B+</option><option>B-</option>
+                      <option>AB+</option><option>AB-</option><option>O+</option><option>O-</option></select></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Voice + Symptoms (FR-01-2, FR-01-3) -->
+            <div class="card">
+              <div class="ch"><span>&#127908;</span><h3>Symptoms + Voice Input (FR-01-2 / FR-01-3)</h3></div>
+              <div class="cb">
+                <div class="fg">
+                  <label>Describe your symptoms <span class="r">*</span>
+                    <span style="font-size:10.5px;font-weight:400;color:#888;margin-left:5px">or use the mic &#8594;</span>
+                  </label>
+                  <div class="vw">
+                    <textarea id="ps" placeholder="Describe location, severity (1-10), onset... e.g. severe chest pain radiating to left arm for 30 minutes with sweating" style="min-height:80px;padding-right:46px"></textarea>
+                    <button class="mb2" id="mic-btn" onclick="toggleVoice()" title="Voice-to-Text (FR-01-3)">&#127908;</button>
+                  </div>
+                  <div class="vs" id="vstat"></div>
+                </div>
+                <!-- Samples -->
+                <div style="margin-bottom:10px">
+                  <div style="font-size:11.5px;font-weight:600;color:#333;margin-bottom:5px">&#128161; Click a sample:</div>
+                  <div class="sp" onclick="useS('Severe chest pain radiating to left arm, shortness of breath, profuse sweating for 30 minutes')">Chest pain + shortness of breath</div>
+                  <div class="sp" onclick="useS('High fever 104°F, severe headache, stiff neck, light sensitivity since 4 hours')">High fever + stiff neck</div>
+                  <div class="sp" onclick="useS('Minor ankle sprain from jogging, mild swelling, pain 4/10, can walk slowly')">Minor ankle sprain</div>
+                </div>
+                <div id="perr" class="al aer" style="display:none"></div>
+                <button class="btn bp bfw" id="subbtn" onclick="subP()">&#128196; Submit &amp; Get AI Triage Assessment</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- RIGHT -->
+          <div style="height: 410.6px">
+            <!-- Photo upload (FR-01-4) -->
+            <div class="card" style="margin-bottom:12px">
+              <div class="ch"><span>&#128247;</span><h3>Injury Photo (FR-01-4 — Optional)</h3></div>
+              <div class="cb" style="padding:12px">
+                <div class="pz" id="pzone" onclick="document.getElementById('pinput').click()">
+                  <input type="file" id="pinput" accept="image/*" onchange="handlePh(this)" style="display:none"/>
+                  <div class="pi">&#128247;</div>
+                  <div class="pt">Click to attach a photo of visible injury</div>
+                  <div class="ph2">JPG / PNG / HEIC &nbsp;&#x2022;&nbsp; Max 5 MB</div>
+                </div>
+                <div class="pp" id="ppreview">
+                  <img id="pimg" alt="Injury preview"/>
+                  <button class="xp" onclick="rmPh()">&times;</button>
+                  <div class="pn" id="pname"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- ESI Scale -->
+            <div class="card">
+              <div class="ch"><span>&#127977;</span><h3>ESI Priority Scale</h3></div>
+              <div class="cb" style="padding:11px">
+                <div class="er"><div class="eb e1">1</div><div><div style="font-weight:600;font-size:12.5px;color:#c0392b">Immediate — Life-Threatening</div><div style="font-size:11px;color:#666">Requires immediate physician attention</div></div></div>
+                <div class="er"><div class="eb e2">2</div><div><div style="font-weight:600;font-size:12.5px;color:#e67e22">Emergent — High Risk</div><div style="font-size:11px;color:#666">Should not wait — unstable patient</div></div></div>
+                <div class="er"><div class="eb e3">3</div><div><div style="font-weight:600;font-size:12.5px;color:#f39c12">Urgent — Multiple Resources</div><div style="font-size:11px;color:#666">Multiple tests or treatments needed</div></div></div>
+                <div class="er"><div class="eb e4">4</div><div><div style="font-weight:600;font-size:12.5px;color:#27ae60">Less Urgent — Single Intervention</div><div style="font-size:11px;color:#666">One test or treatment needed</div></div></div>
+                <div class="er"><div class="eb e5">5</div><div><div style="font-weight:600;font-size:12.5px;color:#7f8c8d">Non-Urgent — No Resources</div><div style="font-size:11px;color:#666">History and examination only</div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div><!-- end reg-form -->
+
+      <!-- CONFIRMATION (hidden) -->
+      <div id="reg-conf" style="display:none">
+        <div class="al aok" style="margin-bottom:12px">&#10003; Registration successful — AI triage complete. Reference number assigned below.</div>
+        <div class="g2">
+          <!-- LEFT -->
+          <div>
+            <div class="card" style="margin-bottom:12px">
+              <div class="ch"><span>&#127977;</span><h3>Triage Result (FR-02)</h3></div>
+              <div class="cb">
+                <div style="display:flex;align-items:center;gap:13px;margin-bottom:11px">
+                  <div class="eb e1" id="c-eb" style="width:44px;height:44px;font-size:17px">1</div>
+                  <div>
+                    <div id="c-el" style="font-size:14px;font-weight:700;color:#c0392b">ESI Level 1 — Immediate</div>
+                    <div class="cw">AI Confidence: <span id="c-cp">93%</span>
+                      <div class="ct" style="width:160px"><div class="cf" id="c-cb" style="width:93%;background:#27ae60"></div></div>
+                    </div>
+                  </div>
+                </div>
+                <div class="al ain" id="c-ex" style="margin-bottom:0;font-size:12.5px"></div>
+              </div>
+            </div>
+            <div class="card" style="margin-bottom:12px">
+              <div class="ch"><span>&#128200;</span><h3>Queue &amp; Reference (FR-05-1 / FR-01-5)</h3></div>
+              <div class="cb">
+                <div style="display:flex;align-items:center;gap:14px;margin-bottom:9px">
+                  <div class="qn" id="c-qp">1</div>
+                  <div>
+                    <div style="font-size:15px;font-weight:700">~<span id="c-wt">0</span> min wait</div>
+                    <div class="wb"><span class="tkd"></span>Updates every 60s</div>
+                    <div style="font-size:11.5px;color:#666;margin-top:4px">Doctor: <strong id="c-dc">—</strong></div>
+                  </div>
+                </div>
+                <div style="margin-bottom:5px"><div class="rt" id="c-rf">PT-XXXXXXXX</div></div>
+                <div id="c-rv" class="al aw" style="display:none;margin-top:8px;margin-bottom:0;font-size:12px">
+                  &#9888; <strong>Flagged for nurse review</strong> — AI confidence below threshold.
+                </div>
+              </div>
+            </div>
+            <div class="card" id="c-phcard" style="display:none;margin-bottom:12px">
+              <div class="ch"><span>&#128247;</span><h3>Attached Photo (FR-01-4)</h3></div>
+              <div class="cb" style="padding:10px 13px">
+                <img id="c-phimg" alt="Injury" style="width:100%;max-height:90px;object-fit:cover;border-radius:4px"/>
+                <div id="c-phname" style="font-size:10.5px;color:#555;margin-top:4px"></div>
+              </div>
+            </div>
+          </div>
+          <!-- RIGHT -->
+          <div>
+            <div class="card" style="margin-bottom:12px">
+              <div class="ch"><span>&#128203;</span><h3>Differential Diagnosis</h3></div>
+              <div class="cb" style="padding:11px 14px" id="c-df"></div>
+            </div>
+            <div class="card">
+              <div class="ch"><span>&#9654;</span><h3>Next Steps</h3></div>
+              <div class="cb" style="padding:11px 14px;font-size:12.5px;color:#333;line-height:1.85">
+                <div style="display:flex;gap:8px;padding:4px 0;border-bottom:1px solid #eee"><span style="width:19px;height:19px;border-radius:50%;background:var(--nv);color:#fff;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;flex-shrink:0">1</span>Nurse verifies your triage assessment</div>
+                <div style="display:flex;gap:8px;padding:4px 0;border-bottom:1px solid #eee"><span style="width:19px;height:19px;border-radius:50%;background:var(--nv);color:#fff;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;flex-shrink:0">2</span>Vital signs recorded at nurse station</div>
+                <div style="display:flex;gap:8px;padding:4px 0;border-bottom:1px solid #eee"><span style="width:19px;height:19px;border-radius:50%;background:var(--nv);color:#fff;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;flex-shrink:0">3</span>Doctor assigned by specialization &amp; workload</div>
+                <div style="display:flex;gap:8px;padding:4px 0"><span style="width:19px;height:19px;border-radius:50%;background:var(--nv);color:#fff;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;flex-shrink:0">4</span>You will be called when doctor is ready</div>
+              </div>
+            </div>
+            <button class="btn bo bfw" style="margin-top:11px" onclick="rstP()">&#8592; Register Another Patient</button>
+          </div>
+        </div>
+      </div><!-- end reg-conf -->
+
+    </div><!-- end .mc -->
+  </div><!-- end #m-pat -->
+
+  <!-- ════════════════════════════════════
+       MODULE 2 — STATUS CHECK (FR-03, FR-05)
+       ════════════════════════════════════ -->
+  <div id="m-sts" class="mp">
+    <div class="mc">
+      <div class="g2">
+        <!-- Search card -->
+        <div>
+          <div class="card" style="margin-bottom:12px">
+            <div class="ch"><span>&#128269;</span><h3>Look Up Reference (FR-05)</h3></div>
+            <div class="cb">
+              <div class="fg">
+                <label>Patient Reference Number <span class="r">*</span></label>
+                <input type="text" id="si" placeholder="PT-XXXXXXXX" style="font-family:monospace;font-size:14px;letter-spacing:.08em;text-transform:uppercase" oninput="this.value=this.value.toUpperCase()"/>
+              </div>
+              <div id="serr" class="al aer" style="display:none"></div>
+              <button class="btn bp bfw" onclick="lookS()">&#128269; Check Status</button>
+              <div style="margin-top:8px;font-size:11.5px;color:#666;text-align:center">Demo: try <strong>PT-DEMO01</strong></div>
+            </div>
+          </div>
+
+          <!-- ESI scale mini ref -->
+          <div class="card">
+            <div class="ch"><span>&#127977;</span><h3>Priority Reference</h3></div>
+            <div class="cb" style="padding:10px 13px;font-size:12px;color:#444">
+              <div style="display:flex;gap:7px;align-items:center;margin-bottom:6px"><div class="eb e1" style="width:22px;height:22px;font-size:10px">1</div><span style="color:#c0392b;font-weight:600">Immediate</span> — Life-threatening</div>
+              <div style="display:flex;gap:7px;align-items:center;margin-bottom:6px"><div class="eb e2" style="width:22px;height:22px;font-size:10px">2</div><span style="color:#e67e22;font-weight:600">Emergent</span> — High risk</div>
+              <div style="display:flex;gap:7px;align-items:center;margin-bottom:6px"><div class="eb e3" style="width:22px;height:22px;font-size:10px">3</div><span style="color:#f39c12;font-weight:600">Urgent</span> — Multiple resources</div>
+              <div style="display:flex;gap:7px;align-items:center;margin-bottom:6px"><div class="eb e4" style="width:22px;height:22px;font-size:10px">4</div><span style="color:#27ae60;font-weight:600">Less Urgent</span> — Single resource</div>
+              <div style="display:flex;gap:7px;align-items:center"><div class="eb e5" style="width:22px;height:22px;font-size:10px">5</div><span style="color:#7f8c8d;font-weight:600">Non-Urgent</span> — No resources</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Result -->
+        <div id="sres" style="display:none">
+          <div class="ub" style="margin-bottom:10px">
+            <div class="tk"><span class="tkd"></span>Auto-refresh every 60s (FR-03-5)</div>
+            <span style="font-size:11.5px;color:#888">Next in <span id="scd">60</span>s</span>
+          </div>
+          <div class="card" style="margin-bottom:12px">
+            <div class="ch"><span>&#128200;</span><h3>Queue Position (FR-05-1 / FR-05-2)</h3></div>
+            <div class="cb">
+              <div style="display:flex;align-items:center;gap:16px;margin-bottom:11px">
+                <div class="qn" id="s-qp">2</div>
+                <div>
+                  <div style="font-size:15px;font-weight:700">~<span id="s-wt">25</span> minutes</div>
+                  <div style="font-size:11px;color:#666;margin-top:2px">Estimated wait time</div>
+                </div>
+              </div>
+              <div class="al ain" id="s-ex" style="margin-bottom:0;font-size:12.5px"></div>
+              <div id="s-wc" class="al aw" style="display:none;margin-top:8px;margin-bottom:0;font-size:12px"></div>
+            </div>
+          </div>
+          <div class="card" style="margin-bottom:12px">
+            <div class="ch"><span>&#128100;</span><h3>Patient Details</h3></div>
+            <div class="cb" style="padding:10px 13px">
+              <table class="gt" style="font-size:12px">
+                <tbody>
+                  <tr><td style="color:#555;font-weight:600;width:80px">Name</td><td id="s-nm">—</td></tr>
+                  <tr><td style="color:#555;font-weight:600">Age</td><td id="s-ag">—</td></tr>
+                  <tr><td style="color:#555;font-weight:600">Reference</td><td id="s-rf" style="font-family:monospace;font-size:11px">—</td></tr>
+                  <tr><td style="color:#555;font-weight:600">Doctor</td><td id="s-dc2">—</td></tr>
+                  <tr><td style="color:#555;font-weight:600">Status</td><td id="s-st">—</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="card" id="s-vc" style="display:none">
+            <div class="ch"><span>&#128138;</span><h3>Recorded Vitals</h3></div>
+            <div class="cb" style="padding:10px 13px"><div class="vg" id="s-vg"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div><!-- end #m-sts -->
+
+  <!-- ════════════════════════════════════
+       MODULE 3 — NURSE CONSOLE (FR-04, FR-06)
+       ════════════════════════════════════ -->
+  <div id="m-nrs" class="mp">
+    <div class="mc">
+      <div class="ub">
+        <div style="display:flex;align-items:center;gap:10px;font-size:12.5px;flex-wrap:wrap">
+          <strong>Nurse:</strong> Sister Kavita Sharma &nbsp;&#x7C;&nbsp;
+          <strong>Shift:</strong> 08:00–16:00 &nbsp;&#x7C;&nbsp;
+          <span style="color:var(--gn);font-weight:600">&#9679; Live</span>
+        </div>
+        <div class="ua">
+          <button class="btn bo sm" onclick="loadQ()">&#8635; Refresh</button>
+          <button class="btn bs sm" onclick="go('pat')">&#43; Register Patient</button>
+        </div>
+      </div>
+
+      <div class="sg">
+        <div class="sc r"><div class="sv r" id="ns-c">0</div><div class="sl">Critical (ESI 1-2)</div></div>
+        <div class="sc o"><div class="sv o" id="ns-w">0</div><div class="sl">Total Waiting</div></div>
+        <div class="sc"><div class="sv" id="ns-t">0</div><div class="sl">In Treatment</div></div>
+        <div class="sc o"><div class="sv o" id="ns-r">0</div><div class="sl">Flagged Review</div></div>
+        <div class="sc"><div class="sv" id="ns-d">4</div><div class="sl">Doctors</div></div>
+        <div class="sc g"><div class="sv g">3</div><div class="sl">Nurses (FR-08-2)</div></div>
+      </div>
+
+      <!-- Flagged panel (FR-06-6) -->
+      <div class="fp2" id="fpanel">
+        <div class="fph">&#9888; Patients Flagged for Manual Review (FR-06-6 / FR-08-5)</div>
+        <div id="flist"></div>
+      </div>
+
+      <div class="card">
+        <div class="ch"><span>&#128203;</span><h3>Active Queue — Priority Ordered (FR-06-1)</h3></div>
+        <div style="padding:0">
+          <div class="tw" id="qbody"><div class="spin"></div></div>
+        </div>
+      </div>
+    </div>
+  </div><!-- end #m-nrs -->
+
+  <!-- ════════════════════════════════════
+       MODULE 4 — ADMIN DASHBOARD (FR-08, FR-09)
+       ════════════════════════════════════ -->
+  <div id="m-adm" class="mp">
+    <div class="mc">
+      <div class="ub">
+        <div style="font-size:12.5px">
+          <strong>Hospital:</strong> City General Hospital &nbsp;&#x7C;&nbsp;
+          <strong>Dept:</strong> Emergency &nbsp;&#x7C;&nbsp;
+          <strong>Shift:</strong> Morning 08:00–16:00
+        </div>
+        <div class="ua">
+          <button class="btn bo sm" onclick="loadA()">&#8635; Refresh</button>
+          <button class="btn bg sm" onclick="expCSV()">&#8659; Export Audit CSV</button>
+        </div>
+      </div>
+
+      <div class="sg">
+        <div class="sc r"><div class="sv r" id="ad-w">0</div><div class="sl">Waiting</div></div>
+        <div class="sc o"><div class="sv o" id="ad-t">0</div><div class="sl">In Treatment</div></div>
+        <div class="sc g"><div class="sv g" id="ad-d">0</div><div class="sl">Discharged</div></div>
+        <div class="sc"><div class="sv" id="ad-dc">4</div><div class="sl">Doctors</div></div>
+        <div class="sc g"><div class="sv g">3</div><div class="sl">Nurses (FR-08-2)</div></div>
+        <div class="sc o"><div class="sv o" id="ad-f">0</div><div class="sl">Flagged (FR-08-5)</div></div>
+      </div>
+
+      <div class="tbr">
+        <button class="tb on" onclick="swT('ov',this)">Overview</button>
+        <button class="tb" onclick="swT('pt',this)">Patient Records</button>
+        <button class="tb" onclick="swT('fl',this)">Flagged Patients</button>
+        <button class="tb" onclick="swT('au',this)">Audit Log (FR-09)</button>
+      </div>
+
+      <!-- OVERVIEW -->
+      <div class="tp on" id="tp-ov">
+        <div class="g2">
+          <div>
+            <div class="card" style="margin-bottom:12px">
+              <div class="ch"><span>&#128202;</span><h3>ESI Distribution (FR-08-1)</h3></div>
+              <div class="cb" id="esdist"><div style="color:#888;font-size:12.5px">Register patients to see distribution.</div></div>
+            </div>
+            <div class="card">
+              <div class="ch"><span>&#8987;</span><h3>Queue Forecast (FR-08-3)</h3></div>
+              <div class="cb">
+                <div class="fp">
+                  <div class="fi"><div class="fn2" id="fc15">—</div><div class="fl">In 15 Min</div></div>
+                  <div class="fi"><div class="fn2" id="fc60">—</div><div class="fl">In 60 Min</div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="card">
+              <div class="ch"><span>&#128104;&#8205;&#9877;</span><h3>Doctors &amp; Nurses On Duty (FR-08-2)</h3></div>
+              <div class="cb" style="padding:10px 13px" id="doclist">
+                <div class="dr"><div class="dav">AS</div><div style="flex:1"><div class="dn">Dr. Anil Sharma</div><div class="ds">Emergency Medicine</div></div><div class="dl">2 patients</div></div>
+                <div class="dr"><div class="dav">PM</div><div style="flex:1"><div class="dn">Dr. Priya Mehta</div><div class="ds">Cardiology</div></div><div class="dl">1 patient</div></div>
+                <div class="dr"><div class="dav">RP</div><div style="flex:1"><div class="dn">Dr. Rohan Patel</div><div class="ds">General Medicine</div></div><div class="dl">3 patients</div></div>
+                <div class="dr"><div class="dav">SI</div><div style="flex:1"><div class="dn">Dr. Sneha Iyer</div><div class="ds">Neurology</div></div><div class="dl">0 patients</div></div>
+                <div style="margin-top:9px;padding-top:9px;border-top:1px solid var(--gm);font-size:11.5px;color:#555">
+                  <div>&#128091; Sister Kavita Sharma — Triage Nurse</div>
+                  <div>&#128091; Nurse Arun Pillai — Ward Nurse</div>
+                  <div>&#128091; Nurse Deepa Rao — ICU Nurse</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PATIENT RECORDS with date/shift filter (FR-08-4) -->
+      <div class="tp" id="tp-pt">
+        <div class="fb2">
+          <label>&#128197; From:</label>
+          <input type="date" id="ffd"/>
+          <label>To:</label>
+          <input type="date" id="ftd"/>
+          <label>Shift:</label>
+          <select id="fsh">
+            <option value="">All Shifts</option>
+            <option>Morning (08:00–16:00)</option>
+            <option>Evening (16:00–00:00)</option>
+            <option>Night (00:00–08:00)</option>
+          </select>
+          <button class="btn bp sm" onclick="loadA()">&#128269; Filter</button>
+          <button class="btn bo sm" onclick="clrF()">&#10005; Clear</button>
+        </div>
+        <div class="card">
+          <div class="ch"><span>&#128100;</span><h3>All Patient Records (FR-08-4)</h3></div>
+          <div class="tw">
+            <table class="gt"><thead><tr>
+              <th>Ref No.</th><th>Name</th><th>Age</th><th>ESI</th><th>Symptoms</th>
+              <th>Wait</th><th>Doctor</th><th>Status</th><th>Time</th>
+            </tr></thead><tbody id="aptb"><tr><td colspan="9" style="text-align:center;color:#888;padding:22px">No patients yet.</td></tr></tbody></table>
+          </div>
+        </div>
+      </div>
+
+      <!-- FLAGGED PATIENTS (FR-08-5) -->
+      <div class="tp" id="tp-fl">
+        <div class="al aw" style="margin-bottom:11px;font-size:12.5px">
+          &#9888; Patients below 60% AI confidence threshold — require nurse verification before priority is confirmed (FR-08-5).
+        </div>
+        <div class="card">
+          <div class="ch"><span>&#9888;</span><h3>Flagged for Manual Review (FR-08-5)</h3></div>
+          <div class="tw">
+            <table class="gt"><thead><tr>
+              <th>Ref No.</th><th>Name</th><th>Age</th><th>AI ESI</th><th>Confidence</th><th>Symptoms</th><th>Registered</th>
+            </tr></thead><tbody id="aftb"><tr><td colspan="7" style="text-align:center;color:#888;padding:22px">No flagged patients.</td></tr></tbody></table>
+          </div>
+        </div>
+      </div>
+
+      <!-- AUDIT LOG (FR-09) -->
+      <div class="tp" id="tp-au">
+        <div class="al ain" style="margin-bottom:11px;font-size:12.5px">
+          &#128274; Immutable log — no edit or delete permitted (FR-09-5). All 5 required fields stored per entry (FR-09-2).
+        </div>
+        <div class="card">
+          <div class="ch"><span>&#128274;</span><h3>AI Decision &amp; Override Audit Log (FR-09-1 to FR-09-4)</h3></div>
+          <div class="tw">
+            <table class="gt"><thead><tr>
+              <th>Timestamp</th><th>Patient ID</th><th>Action</th><th>ESI</th><th>Confidence</th><th>Symptom Input (FR-09-2)</th>
+            </tr></thead><tbody id="aatb"><tr><td colspan="6" style="text-align:center;color:#888;padding:22px">No audit entries yet.</td></tr></tbody></table>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- end .mc -->
+  </div><!-- end #m-adm -->
+
+</div><!-- end #shell -->
+
+<!-- ═══════════════ MODALS ═══════════════ -->
+
+<!-- Override (FR-06-2, FR-04-2) -->
+<div class="mbd" id="movr">
+  <div class="mo">
+    <div class="moh"><h3>&#9998; Override ESI + Doctor (FR-06-2 / FR-04-2)</h3><button class="mox" onclick="cm('movr')">&times;</button></div>
+    <div class="mob">
+      <div class="al aw" style="font-size:12.5px;margin-bottom:11px">Recorded in immutable audit log (FR-09-3).</div>
+      <div id="oi" style="margin-bottom:11px;font-size:12.5px;color:#333;background:var(--nvl);padding:8px 11px;border-radius:4px"></div>
+      <div class="g2" style="gap:10px">
+        <div class="fg">
+          <label>New ESI Level <span class="r">*</span></label>
+          <select id="oesi">
+            <option value="1">Level 1 — Immediate</option><option value="2">Level 2 — Emergent</option>
+            <option value="3">Level 3 — Urgent</option><option value="4">Level 4 — Less Urgent</option><option value="5">Level 5 — Non-Urgent</option>
+          </select>
+        </div>
+        <div class="fg">
+          <label>Reassign Doctor (FR-04-2)</label>
+          <select id="odoc">
+            <option value="">— Keep current —</option>
+            <option value="D001">Dr. Anil Sharma (Emergency)</option>
+            <option value="D002">Dr. Priya Mehta (Cardiology)</option>
+            <option value="D003">Dr. Rohan Patel (General)</option>
+            <option value="D004">Dr. Sneha Iyer (Neurology)</option>
+          </select>
+        </div>
+      </div>
+      <div class="fg" style="margin-bottom:0">
+        <label>Clinical Reason <span class="r">*</span> — mandatory (FR-06-3)</label>
+        <textarea id="orsn" placeholder="Provide clinical justification for overriding AI assessment..." style="min-height:70px"></textarea>
+        <div class="hint">Min 10 chars. Included in handoff note (FR-07-4).</div>
+      </div>
+      <div id="oerr" class="al aer" style="display:none;margin-top:9px;margin-bottom:0"></div>
+    </div>
+    <div class="mof">
+      <button class="btn bo" onclick="cm('movr')">Cancel</button>
+      <button class="btn bd" onclick="confO()">&#9998; Confirm Override (Click 2)</button>
+    </div>
+  </div>
+</div>
+
+<!-- Vitals (FR-06-4) -->
+<div class="mbd" id="mvit">
+  <div class="mo">
+    <div class="moh"><h3>&#128138; Record Vital Signs (FR-06-4)</h3><button class="mox" onclick="cm('mvit')">&times;</button></div>
+    <div class="mob">
+      <div id="vi2" style="margin-bottom:11px;font-size:12.5px;color:#333;background:var(--nvl);padding:8px 11px;border-radius:4px"></div>
+      <div class="g2" style="gap:10px">
+        <div class="fg"><label>Systolic BP <span style="color:#888;font-weight:400">(mmHg)</span></label><input type="number" id="vs" value="120" min="60" max="250"/></div>
+        <div class="fg"><label>Diastolic BP <span style="color:#888;font-weight:400">(mmHg)</span></label><input type="number" id="vd" value="80" min="40" max="150"/></div>
+        <div class="fg"><label>Heart Rate <span style="color:#888;font-weight:400">(bpm)</span></label><input type="number" id="vh" value="72" min="30" max="220"/></div>
+        <div class="fg"><label>Temperature <span style="color:#888;font-weight:400">(°F)</span></label><input type="number" id="vt" value="98.6" step="0.1"/></div>
+        <div class="fg" style="grid-column:span 2"><label>SpO₂ <span style="color:#888;font-weight:400">(%)</span></label><input type="number" id="vo" value="98" min="70" max="100"/></div>
+      </div>
+    </div>
+    <div class="mof">
+      <button class="btn bo" onclick="cm('mvit')">Cancel</button>
+      <button class="btn bg" onclick="saveVit()">&#128394; Save Vitals</button>
+    </div>
+  </div>
+</div>
+
+<!-- Handoff (FR-07) -->
+<div class="mbd" id="mhnd" style="align-items:flex-start;padding-top:32px">
+  <div class="mo" style="width:620px;max-width:96vw">
+    <div class="moh"><h3>&#128196; Doctor Handoff Note (FR-07)</h3><button class="mox" onclick="cm('mhnd')">&times;</button></div>
+    <div class="mob">
+      <div class="al aok" style="font-size:12px;margin-bottom:10px">Patient moved to <strong>In Treatment</strong>. Note generated within 2 seconds (FR-07-3).</div>
+      <div class="hb" id="hcont"></div>
+    </div>
+    <div class="mof">
+      <button class="btn bo" onclick="cpyH()">&#128203; Copy (FR-07-5)</button>
+      <button class="btn bp" onclick="cm('mhnd')">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ JAVASCRIPT ═══════════════ -->
+</div>
+
+<!-- ════════════ SCRIPTS ════════════ -->
+<script>
+/* ── LOGIN LOGIC ─────────────────────────────── */
+
+/* ---------- CAPTCHA ---------- */
+let currentCaptcha = '';
+const captchaCanvas = document.getElementById('captchaCanvas');
+const CAPTCHA_CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+
+function generateCaptcha() {
+  currentCaptcha = '';
+  for (let i = 0; i < 5; i++) {
+    currentCaptcha += CAPTCHA_CHARS.charAt(Math.floor(Math.random() * CAPTCHA_CHARS.length));
+  }
+  drawCaptcha();
+}
+function drawCaptcha() {
+  const ctx = captchaCanvas.getContext('2d');
+  const W = captchaCanvas.width, H = captchaCanvas.height;
+
+  // gradient background
+  const grad = ctx.createLinearGradient(0, 0, W, H);
+  grad.addColorStop(0, '#eef2fb');
+  grad.addColorStop(1, '#dfe7f5');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, W, H);
+
+  // noise dots
+  for (let i = 0; i < 80; i++) {
+    ctx.fillStyle = `rgba(26,63,143,${Math.random() * 0.3})`;
+    ctx.fillRect(Math.random() * W, Math.random() * H, 2, 2);
+  }
+  // interference lines
+  for (let i = 0; i < 4; i++) {
+    ctx.strokeStyle = `rgba(224,138,43,${0.3 + Math.random() * 0.3})`;
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(Math.random() * W, Math.random() * H);
+    ctx.bezierCurveTo(Math.random() * W, Math.random() * H, Math.random() * W, Math.random() * H, Math.random() * W, Math.random() * H);
+    ctx.stroke();
+  }
+  // characters
+  const colors = ['#0f2c66', '#15387f', '#1a3f8f', '#e08a2b'];
+  for (let i = 0; i < currentCaptcha.length; i++) {
+    ctx.save();
+    const x = 18 + i * 25;
+    const y = H / 2 + (Math.random() * 8 - 4);
+    const angle = (Math.random() * 0.5 - 0.25);
+    ctx.translate(x, y);
+    ctx.rotate(angle);
+    ctx.font = 'bold 24px "JetBrains Mono", monospace';
+    ctx.fillStyle = colors[Math.floor(Math.random() * colors.length)];
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(currentCaptcha[i], 0, 0);
+    ctx.restore();
+  }
+}
+document.getElementById('captchaRefresh').addEventListener('click', generateCaptcha);
+generateCaptcha();
+
+/* ---------- PASSWORD SHOW/HIDE + STRENGTH ---------- */
+const pwInput = document.getElementById('password');
+const pwToggle = document.getElementById('pwToggle');
+const eyeIcon = document.getElementById('eyeIcon');
+const pwStrength = document.getElementById('pwStrength');
+const pwLabel = document.getElementById('pwLabel');
+
+pwToggle.addEventListener('click', () => {
+  const isPw = pwInput.type === 'password';
+  pwInput.type = isPw ? 'text' : 'password';
+  pwToggle.setAttribute('aria-label', isPw ? 'Hide password' : 'Show password');
+  eyeIcon.innerHTML = isPw
+    ? '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>'
+    : '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
+});
+
+function scorePassword(p) {
+  let s = 0;
+  if (!p) return 0;
+  if (p.length >= 8) s++;
+  if (p.length >= 12) s++;
+  if (/[A-Z]/.test(p) && /[a-z]/.test(p)) s++;
+  if (/\d/.test(p)) s++;
+  if (/[^A-Za-z0-9]/.test(p)) s++;
+  return Math.min(s, 4);
+}
+pwInput.addEventListener('input', () => {
+  const val = pwInput.value;
+  if (!val) { pwStrength.style.display = 'none'; return; }
+  pwStrength.style.display = 'flex';
+  const score = scorePassword(val);
+  const labels = ['', 'Weak', 'Fair', 'Good', 'Strong'];
+  const classes = ['', 'weak', 'fair', 'good', 'strong'];
+  pwStrength.className = 'pw-strength ' + classes[score];
+  pwLabel.textContent = labels[score] || 'Weak';
+});
+
+/* ---------- ATTEMPTS ---------- */
+let attempts = 3;
+function updateAttempts() {
+  const el = document.getElementById('attemptsText');
+  const badge = document.getElementById('attemptsBadge');
+  el.textContent = attempts + ' attempt' + (attempts === 1 ? '' : 's') + ' remaining';
+  badge.classList.toggle('ok', attempts > 1);
+}
+
+/* ---------- STEP NAVIGATION ---------- */
+const stepper = document.getElementById('stepper');
+let chosenMethod = 'otp';
+
+function goToStep(n, sub) {
+  document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+  let sel;
+  if (sub) sel = document.querySelector('.step[data-step="' + n + '"][data-sub="' + sub + '"]');
+  else sel = document.querySelector('.step[data-step="' + n + '"]:not([data-sub])');
+  if (sel) sel.classList.add('active');
+
+  // update stepper
+  stepper.querySelectorAll('.s').forEach(s => {
+    const sn = parseInt(s.dataset.s, 10);
+    s.classList.toggle('active', sn === (n > 3 ? 3 : n));
+    s.classList.toggle('done', sn < (n > 3 ? 3 : n) || n === 4);
+  });
+  stepper.querySelectorAll('.bar').forEach((b, i) => {
+    b.classList.toggle('filled', (i + 1) < (n > 3 ? 3 : n) || n === 4);
+  });
+}
+
+/* back buttons */
+document.querySelectorAll('[data-back]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const target = parseInt(btn.dataset.back, 10);
+    // reset OTP timer if leaving step 3-otp
+    if (otpInterval) { clearInterval(otpInterval); otpInterval = null; }
+    // stop video if leaving face
+    stopFaceCamera();
+    goToStep(target);
+  });
+});
+
+/* ---------- STEP 1 SUBMIT ---------- */
+const alertBox1 = document.getElementById('alertBox1');
+const alertMsg1 = document.getElementById('alertMsg1');
+function showAlert(box, msg, type) {
+  box.className = 'alert show ' + (type || 'error');
+  box.querySelector('span').textContent = msg;
+}
+function hideAlert(box) { box.className = 'alert ' + Array.from(box.classList).filter(c => c !== 'alert' && c !== 'show').join(' '); box.classList.remove('show'); }
+
+document.getElementById('loginForm').addEventListener('submit', (e) => {
+  e.preventDefault();
+  const id = document.getElementById('loginId').value.trim();
+  const pw = pwInput.value.trim();
+  const cap = document.getElementById('captchaInput').value.trim().toUpperCase();
+
+  if (!id || !pw) { showAlert(alertBox1, 'Please enter your Login ID and password.', 'error'); return; }
+  if (pw.length < 6) { showAlert(alertBox1, 'Password must be at least 6 characters.', 'error'); return; }
+  if (!cap) { showAlert(alertBox1, 'Please enter the CAPTCHA.', 'error'); return; }
+  if (cap !== currentCaptcha) {
+    attempts--;
+    updateAttempts();
+    if (attempts <= 0) {
+      showAlert(alertBox1, 'Account temporarily locked. Try again in 5 minutes.', 'error');
+      document.querySelector('#loginForm .btn-primary').disabled = true;
+      return;
+    }
+    showAlert(alertBox1, 'CAPTCHA does not match. Please try again.', 'error');
+    generateCaptcha();
+    document.getElementById('captchaInput').value = '';
+    return;
+  }
+
+  alertBox1.classList.remove('show');
+  goToStep(2);
+});
+
+/* ---------- STEP 2: METHOD SELECTION ---------- */
+document.querySelectorAll('.method').forEach(m => {
+  m.addEventListener('click', () => {
+    document.querySelectorAll('.method').forEach(x => x.classList.remove('selected'));
+    m.classList.add('selected');
+    chosenMethod = m.dataset.method;
+  });
+});
+
+document.getElementById('methodContinue').addEventListener('click', () => {
+  if (chosenMethod === 'otp' || chosenMethod === 'combo') { startOtpStep(); goToStep(3, 'otp'); }
+  else if (chosenMethod === 'face') { goToStep(3, 'face'); }
+  else if (chosenMethod === 'bio')  { goToStep(3, 'bio'); }
+});
+
+/* ---------- STEP 3A: OTP ---------- */
+const otpInputs = document.querySelectorAll('#otpInputs input');
+otpInputs.forEach((inp, idx) => {
+  inp.addEventListener('input', e => {
+    const v = e.target.value.replace(/\D/g, '');
+    e.target.value = v.slice(-1);
+    if (e.target.value) {
+      e.target.classList.add('filled');
+      if (idx < otpInputs.length - 1) otpInputs[idx + 1].focus();
+    } else {
+      e.target.classList.remove('filled');
+    }
+  });
+  inp.addEventListener('keydown', e => {
+    if (e.key === 'Backspace' && !e.target.value && idx > 0) otpInputs[idx - 1].focus();
+  });
+  inp.addEventListener('paste', e => {
+    e.preventDefault();
+    const data = (e.clipboardData.getData('text') || '').replace(/\D/g, '').slice(0, 6);
+    for (let i = 0; i < data.length && (idx + i) < otpInputs.length; i++) {
+      otpInputs[idx + i].value = data[i];
+      otpInputs[idx + i].classList.add('filled');
+    }
+    const next = Math.min(idx + data.length, otpInputs.length - 1);
+    otpInputs[next].focus();
+  });
+});
+
+let otpInterval = null;
+let otpSeconds = 120;
+function startOtpStep() {
+  otpSeconds = 120;
+  otpInputs.forEach(i => { i.value = ''; i.classList.remove('filled'); });
+  document.getElementById('alertBoxOtp').classList.remove('show');
+  document.getElementById('otpResend').classList.add('disabled');
+  updateOtpTimer();
+  if (otpInterval) clearInterval(otpInterval);
+  otpInterval = setInterval(() => {
+    otpSeconds--;
+    if (otpSeconds <= 0) {
+      clearInterval(otpInterval); otpInterval = null;
+      document.getElementById('otpTimer').textContent = '00:00';
+      document.getElementById('otpResend').classList.remove('disabled');
+    } else {
+      updateOtpTimer();
+    }
+  }, 1000);
+}
+function updateOtpTimer() {
+  const m = String(Math.floor(otpSeconds / 60)).padStart(2, '0');
+  const s = String(otpSeconds % 60).padStart(2, '0');
+  document.getElementById('otpTimer').textContent = m + ':' + s;
+}
+document.getElementById('otpResend').addEventListener('click', e => {
+  e.preventDefault();
+  if (e.target.classList.contains('disabled')) return;
+  startOtpStep();
+});
+document.getElementById('otpVerify').addEventListener('click', () => {
+  const code = Array.from(otpInputs).map(i => i.value).join('');
+  const alertBox = document.getElementById('alertBoxOtp');
+  if (code.length < 6) {
+    showAlert(alertBox, 'Please enter all 6 digits.', 'error');
+    return;
+  }
+  // demo: any code works — in prod, verify server-side
+  if (otpInterval) { clearInterval(otpInterval); otpInterval = null; }
+  if (chosenMethod === 'combo') {
+    // OTP passed → now require biometric
+    goToStep(3, 'bio');
+  } else {
+    completeAuth('OTP');
+  }
+});
+
+/* ---------- STEP 3B: FACIAL ---------- */
+let faceStream = null;
+async function startFaceCamera() {
+  const video = document.getElementById('faceVideo');
+  const placeholder = document.getElementById('facePlaceholder');
+  const alertBox = document.getElementById('alertBoxFace');
+  try {
+    faceStream = await navigator.mediaDevices.getUserMedia({ video: { width: 320, height: 320, facingMode: 'user' }, audio: false });
+    video.srcObject = faceStream;
+    placeholder.style.display = 'none';
+    video.style.display = 'block';
+    alertBox.classList.remove('show');
+    setFaceStatus('Ready — tap Start Scan to verify');
+    return true;
+  } catch (err) {
+    video.style.display = 'none';
+    placeholder.style.display = 'grid';
+    showAlert(alertBox, 'Camera unavailable. You can still simulate the scan.', 'warn');
+    setFaceStatus('Camera not available — simulation mode');
+    return false;
+  }
+}
+function stopFaceCamera() {
+  if (faceStream) {
+    faceStream.getTracks().forEach(t => t.stop());
+    faceStream = null;
+    const video = document.getElementById('faceVideo');
+    if (video) video.srcObject = null;
+  }
+}
+function setFaceStatus(txt, done) {
+  const st = document.getElementById('faceStatus');
+  document.getElementById('faceStatusText').textContent = txt;
+  st.classList.toggle('done', !!done);
+}
+document.querySelectorAll('.step[data-sub="face"]').forEach(s => {
+  // we trigger camera start when step becomes active — observe via MutationObserver
+  const mo = new MutationObserver(() => {
+    if (s.classList.contains('active')) { startFaceCamera(); }
+    else { stopFaceCamera(); }
+  });
+  mo.observe(s, { attributes: true, attributeFilter: ['class'] });
+});
+document.getElementById('faceStart').addEventListener('click', () => {
+  const btn = document.getElementById('faceStart');
+  btn.disabled = true;
+  btn.innerHTML = 'Scanning…';
+  const progress = document.getElementById('faceProgress');
+  let pct = 0;
+  setFaceStatus('Detecting face…');
+  const iv = setInterval(() => {
+    pct += 4 + Math.random() * 6;
+    if (pct >= 100) {
+      pct = 100;
+      progress.style.width = '100%';
+      clearInterval(iv);
+      setFaceStatus('Identity verified', true);
+      setTimeout(() => {
+        stopFaceCamera();
+        completeAuth('Facial Recognition');
+      }, 700);
+    } else {
+      progress.style.width = pct + '%';
+      if (pct > 30 && pct < 60) setFaceStatus('Checking liveness…');
+      else if (pct > 60) setFaceStatus('Matching biometric template…');
+    }
+  }, 120);
+});
+
+/* ---------- STEP 3C: BIOMETRIC ---------- */
+document.getElementById('fpStart').addEventListener('click', async () => {
+  const icon = document.getElementById('fpIcon');
+  const btn = document.getElementById('fpStart');
+  const statusEl = document.getElementById('fpStatusText');
+  const statusWrap = document.getElementById('fpStatus');
+  btn.disabled = true;
+  btn.innerHTML = 'Authenticating…';
+  icon.classList.add('scanning');
+  icon.classList.remove('done');
+  statusEl.textContent = 'Place finger on sensor…';
+  statusWrap.classList.remove('done');
+
+  // Try WebAuthn if available (best-effort, non-blocking)
+  let webAuthnUsed = false;
+  if (window.PublicKeyCredential && navigator.credentials && navigator.credentials.get) {
+    try {
+      const avail = await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable?.();
+      if (avail) {
+        webAuthnUsed = true;
+        statusEl.textContent = 'Prompting device authenticator…';
+      }
+    } catch (_) {}
+  }
+
+  // simulate scan progression
+  setTimeout(() => { statusEl.textContent = 'Reading fingerprint…'; }, 600);
+  setTimeout(() => { statusEl.textContent = 'Matching template…'; }, 1300);
+  setTimeout(() => {
+    icon.classList.remove('scanning');
+    icon.classList.add('done');
+    statusEl.textContent = 'Authenticated successfully';
+    statusWrap.classList.add('done');
+    setTimeout(() => {
+      completeAuth(webAuthnUsed ? 'WebAuthn Biometric' : 'Fingerprint (simulated)');
+    }, 600);
+  }, 2100);
+});
+
+/* ---------- STEP 4: SUCCESS ---------- */
+function completeAuth(method) {
+  goToStep(4);
+  setTimeout(() => { launchApp(); }, 1800);
+  const now = new Date();
+  document.getElementById('sessionTime').textContent = now.toLocaleString('en-IN', { hour12: true });
+  let via = 'Password + CAPTCHA';
+  if (chosenMethod === 'otp')   via += ' + OTP';
+  if (chosenMethod === 'face')  via += ' + Facial Recognition';
+  if (chosenMethod === 'bio')   via += ' + Biometric';
+  if (chosenMethod === 'combo') via += ' + OTP + Biometric';
+  document.getElementById('verifiedVia').textContent = via;
+}
+
+
+/* ── APP LAUNCH BRIDGE ───────────────────────── */
+function launchApp() {
+  const loginLayer = document.getElementById('login-layer');
+  const splash     = document.getElementById('launch-splash');
+  const appLayer   = document.getElementById('app-layer');
+
+  // 1. Fade out login panel
+  loginLayer.classList.add('fade-out');
+
+  // 2. Show branded splash
+  setTimeout(() => {
+    loginLayer.style.display = 'none';
+    splash.classList.add('show');
+  }, 500);
+
+  // 3. Fade in app
+  setTimeout(() => {
+    splash.classList.remove('show');
+    splash.classList.add('hide');
+    appLayer.removeAttribute('aria-hidden');
+    appLayer.style.display = 'block';
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      appLayer.classList.add('visible');
+    }));
+  }, 1750);
+
+  // 4. Clean up splash
+  setTimeout(() => { splash.remove(); }, 2400);
+}
+</script>
+
+<script>
+/* ── MAIN APPLICATION LOGIC ──────────────────── */
+
+/* ════════════════════════════
+   STATE
+   ════════════════════════════ */
+const S={pts:{},audit:[],ovrId:null,vitId:null,photo:null,photoName:null,
+         recog:null,listening:false,sTimer:null,lastWait:{}};
+
+const DOCS=[
+  {id:'D001',nm:'Dr. Anil Sharma',sp:'Emergency Medicine',in:'AS',ld:2},
+  {id:'D002',nm:'Dr. Priya Mehta',sp:'Cardiology',in:'PM',ld:1},
+  {id:'D003',nm:'Dr. Rohan Patel',sp:'General Medicine',in:'RP',ld:3},
+  {id:'D004',nm:'Dr. Sneha Iyer',sp:'Neurology',in:'SI',ld:0},
+];
+const ELB={1:'Immediate',2:'Emergent',3:'Urgent',4:'Less Urgent',5:'Non-Urgent'};
+const EC={1:'#c0392b',2:'#e67e22',3:'#f39c12',4:'#27ae60',5:'#7f8c8d'};
+const CKW=['chest pain','shortness of breath','cannot breathe','unconscious','stroke','heart attack','not breathing','seizure','bleeding heavily','severe head'];
+const UKW=['severe pain','high fever','vomiting blood','fracture','deep cut','abdominal pain','difficulty breathing'];
+
+/* ════════════════════════════
+   MOCK TRIAGE AI
+   ════════════════════════════ */
+function triage(sy){
+  const t=sy.toLowerCase();let esi,conf;
+  if(CKW.some(k=>t.includes(k))){esi=Math.random()>.5?1:2;conf=.85+Math.random()*.12;}
+  else if(UKW.some(k=>t.includes(k))){esi=Math.random()>.5?2:3;conf=.72+Math.random()*.14;}
+  else if(sy.length<25){esi=4;conf=.52+Math.random()*.12;}
+  else{esi=Math.random()>.6?3:Math.random()>.5?4:5;conf=.65+Math.random()*.18;}
+  conf=Math.round(conf*100)/100;
+  const df={1:['Acute Myocardial Infarction','Tension Pneumothorax','Aortic Dissection'],
+            2:['Unstable Angina','Pulmonary Embolism','Severe Sepsis'],
+            3:['Community-Acquired Pneumonia','Moderate Asthma','Appendicitis'],
+            4:['Urinary Tract Infection','Minor Fracture','Gastroenteritis'],
+            5:['Upper Respiratory Infection','Minor Sprain','Tension Headache']};
+  const ex={1:'You require IMMEDIATE attention. Our medical team is being called right now.',
+            2:'Your condition is serious. You will be seen very shortly — please stay at reception.',
+            3:'You need urgent care. A doctor will assess you within approximately 30 minutes.',
+            4:'Your condition is stable. Estimated wait is 1–2 hours.',
+            5:'Your condition is non-urgent. Please inform the nurse of any changes.'};
+  const doc=DOCS.filter(d=>esi<=2?['Emergency Medicine','Cardiology'].includes(d.sp):true)
+               .sort((a,b)=>a.ld-b.ld)[0];
+  return{esi,conf,df:df[esi],ex:ex[esi],doc,flag:conf<.60};
+}
+
+function calcW(esi,pid){
+  const q=Object.values(S.pts).filter(p=>p.status==='waiting');
+  const ah=q.filter(p=>p.esi<=esi&&p.id!==pid);
+  return({1:0,2:5,3:20,4:50,5:90}[esi]||30)+ah.length*8;
+}
+
+function qPos(pid){
+  const q=Object.values(S.pts).filter(p=>p.status==='waiting')
+           .sort((a,b)=>a.esi-b.esi||new Date(a.ts)-new Date(b.ts));
+  const i=q.findIndex(p=>p.id===pid);return i>=0?i+1:0;
+}
+
+function uid(){return'PT-'+Math.random().toString(36).substr(2,8).toUpperCase()}
+
+/* ════════════════════════════
+   NAVIGATION
+   ════════════════════════════ */
+const BCL={pat:'Patient Registration',sts:'Check Status',nrs:'Nurse Console',adm:'Admin Dashboard'};
+function go(m){
+  document.querySelectorAll('.mp').forEach(e=>e.classList.remove('on'));
+  document.querySelectorAll('.nv button').forEach(e=>e.classList.remove('on'));
+  document.getElementById('m-'+m).classList.add('on');
+  document.getElementById('n-'+m).classList.add('on');
+  if(m==='nrs')loadQ();
+  if(m==='adm')loadA();
+}
+
+/* ════════════════════════════
+   VOICE TO TEXT (FR-01-3)
+   ════════════════════════════ */
+function toggleVoice(){
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){toast('Voice input not supported. Please use Chrome or Edge.');return;}
+  if(S.listening){stopV();return;}
+  const r=new SR();r.continuous=true;r.interimResults=true;r.lang='en-IN';
+  S.recog=r;S.listening=true;
+  const btn=document.getElementById('mic-btn');
+  btn.classList.add('rec');btn.title='Click to stop';
+  document.getElementById('vstat').innerHTML='<span class="vd"></span>Listening — speak your symptoms…';
+  let fin='';
+  r.onresult=e=>{let im='';for(let i=e.resultIndex;i<e.results.length;i++){if(e.results[i].isFinal)fin+=e.results[i][0].transcript+' ';else im+=e.results[i][0].transcript;}document.getElementById('ps').value=fin+im;};
+  r.onerror=e=>{document.getElementById('vstat').innerHTML='<span style="color:var(--rd)">&#9888; Error: '+e.error+'</span>';stopV();};
+  r.onend=()=>stopV();
+  r.start();
+}
+function stopV(){
+  if(S.recog){try{S.recog.stop();}catch(e){}}S.listening=false;
+  const btn=document.getElementById('mic-btn');
+  if(btn){btn.classList.remove('rec');btn.title='Voice-to-Text';}
+  const txt=document.getElementById('ps')?.value?.trim();
+  const vs=document.getElementById('vstat');
+  if(vs)vs.innerHTML=txt?'<span style="color:var(--gn)">&#10003; Captured ('+txt.split(' ').length+' words)</span>':'';
+}
+
+/* ════════════════════════════
+   PHOTO (FR-01-4)
+   ════════════════════════════ */
+function handlePh(inp){
+  const f=inp.files[0];if(!f)return;
+  if(f.size>5*1024*1024){toast('Photo exceeds 5 MB limit.');return;}
+  S.photoName=f.name;
+  const rd=new FileReader();
+  rd.onload=e=>{S.photo=e.target.result;
+    document.getElementById('pimg').src=e.target.result;
+    document.getElementById('pname').textContent='&#128247; '+f.name+' ('+Math.round(f.size/1024)+' KB)';
+    document.getElementById('ppreview').style.display='block';
+    document.getElementById('pzone').style.display='none';
+    toast('Photo attached: '+f.name);};
+  rd.readAsDataURL(f);
+}
+function rmPh(){
+  S.photo=null;S.photoName=null;
+  document.getElementById('pinput').value='';
+  document.getElementById('ppreview').style.display='none';
+  document.getElementById('pzone').style.display='block';
+}
+
+/* ════════════════════════════
+   PATIENT REGISTRATION
+   ════════════════════════════ */
+function useS(t){document.getElementById('ps').value=t}
+
+function subP(){
+  const nm=document.getElementById('pn').value.trim();
+  const ag=parseInt(document.getElementById('pa').value);
+  const ct=document.getElementById('pc').value.trim();
+  const sy=document.getElementById('ps').value.trim();
+  const err=document.getElementById('perr');
+  if(!nm||!ag||!ct||!sy){err.textContent='All fields marked * are mandatory.';err.style.display='block';return;}
+  if(sy.length<20){err.textContent='Please provide more detail in your symptom description.';err.style.display='block';return;}
+  err.style.display='none';
+  const btn=document.getElementById('subbtn');btn.textContent='Analysing…';btn.disabled=true;
+  stopV();
+  setTimeout(()=>{
+    btn.textContent='&#128196; Submit & Get AI Triage Assessment';btn.disabled=false;
+    const tr=triage(sy);const id=uid();
+    const p={id,nm,ag,ct,sy,esi:tr.esi,conf:tr.conf,df:tr.df,ex:tr.ex,doc:tr.doc,flag:tr.flag,
+              status:'waiting',vitals:null,overridden:false,ovrReason:null,
+              photo:S.photo,photoName:S.photoName,ts:new Date().toISOString()};
+    S.pts[id]=p;
+    S.audit.unshift({ts:new Date().toISOString(),pid:id,action:'AI_TRIAGE',esi:tr.esi,conf:tr.conf,symptoms:sy});
+    tr.doc.ld++;S.photo=null;S.photoName=null;
+    document.getElementById('ppreview').style.display='none';
+    document.getElementById('pzone').style.display='block';
+    document.getElementById('pinput').value='';
+    showConf(p);
+  },1100);
+}
+
+function showConf(p){
+  document.getElementById('reg-form').style.display='none';
+  document.getElementById('reg-conf').style.display='block';
+  const pct=Math.round(p.conf*100);
+  document.getElementById('c-eb').className=`eb e${p.esi}`;
+  document.getElementById('c-eb').textContent=p.esi;
+  document.getElementById('c-el').textContent=`ESI Level ${p.esi} — ${ELB[p.esi]}`;
+  document.getElementById('c-el').style.color=EC[p.esi];
+  document.getElementById('c-cp').textContent=pct+'%';
+  const cc=pct>=80?'#27ae60':pct>=60?'#f39c12':'#c0392b';
+  document.getElementById('c-cb').style.cssText=`width:${pct}%;background:${cc}`;
+  document.getElementById('c-ex').textContent=p.ex;
+  document.getElementById('c-qp').textContent=qPos(p.id)||1;
+  document.getElementById('c-wt').textContent=calcW(p.esi,p.id);
+  document.getElementById('c-dc').textContent=p.doc.nm;
+  document.getElementById('c-rf').textContent=p.id;
+  if(p.flag)document.getElementById('c-rv').style.display='block';
+  document.getElementById('c-df').innerHTML=p.df.map((d,i)=>`
+    <div style="display:flex;align-items:center;gap:8px;padding:6px 0;${i<p.df.length-1?'border-bottom:1px solid #eee;':''}">
+      <span style="width:18px;height:18px;border-radius:50%;background:var(--nvl);color:var(--nv);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;flex-shrink:0">${i+1}</span>
+      <span style="font-size:13px">${d}</span>
+    </div>`).join('');
+  if(p.photo){
+    document.getElementById('c-phcard').style.display='block';
+    document.getElementById('c-phimg').src=p.photo;
+    document.getElementById('c-phname').textContent='&#128247; '+p.photoName;
+  }
+}
+
+function rstP(){
+  document.getElementById('reg-form').style.display='block';
+  document.getElementById('reg-conf').style.display='none';
+  document.getElementById('c-rv').style.display='none';
+  document.getElementById('c-phcard').style.display='none';
+  ['pn','pa','pc','ps'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=''});
+  document.getElementById('vstat').innerHTML='';
+  document.getElementById('perr').style.display='none';
+}
+
+/* ════════════════════════════
+   STATUS CHECK (FR-05 + FR-03-5)
+   ════════════════════════════ */
+function lookS(){
+  const id=document.getElementById('si').value.trim();
+  const p=S.pts[id];const err=document.getElementById('serr');
+  if(!p){err.textContent='No patient found for "'+id+'". Please check the reference number.';
+    err.style.display='block';document.getElementById('sres').style.display='none';return;}
+  err.style.display='none';
+  document.getElementById('sres').style.display='block';
+  renderS(p);startCD(id);
+}
+
+function renderS(p){
+  const pos=qPos(p.id)||'—';const wait=calcW(p.esi,p.id);
+  document.getElementById('s-qp').textContent=pos;
+  document.getElementById('s-wt').textContent=wait;
+  document.getElementById('s-ex').textContent=p.ex;
+  document.getElementById('s-nm').textContent=p.nm;
+  document.getElementById('s-ag').textContent=p.ag+' years';
+  document.getElementById('s-rf').textContent=p.id;
+  document.getElementById('s-dc2').textContent=p.doc.nm;
+  document.getElementById('s-st').innerHTML=`<span class="tag ${p.status==='waiting'?'trv':p.status==='in_treatment'?'tcr':'tdn'}">${p.status.replace('_',' ')}</span>`;
+  const prev=S.lastWait[p.id];
+  if(prev!==undefined&&Math.abs(wait-prev)>5){
+    const wc=document.getElementById('s-wc');
+    wc.textContent=`&#9650; Wait time ${prev>wait?'decreased':'increased'} by ${Math.abs(wait-prev)} min due to queue reordering (FR-05-4).`;
+    wc.style.display='block';
+  }
+  S.lastWait[p.id]=wait;
+  if(p.vitals){
+    document.getElementById('s-vc').style.display='block';
+    document.getElementById('s-vg').innerHTML=`
+      <div class="vi"><div class="vl">Blood Pressure</div><div class="vv">${p.vitals.bp}</div><div class="vu">mmHg</div></div>
+      <div class="vi"><div class="vl">Heart Rate</div><div class="vv">${p.vitals.hr}</div><div class="vu">bpm</div></div>
+      <div class="vi"><div class="vl">Temperature</div><div class="vv">${p.vitals.temp}</div><div class="vu">°F</div></div>
+      <div class="vi"><div class="vl">SpO₂</div><div class="vv">${p.vitals.spo2}</div><div class="vu">%</div></div>`;
+  }
+}
+
+function startCD(id){
+  if(S.sTimer)clearInterval(S.sTimer);let c=60;
+  S.sTimer=setInterval(()=>{c--;document.getElementById('scd').textContent=c;
+    if(c<=0){c=60;const p=S.pts[id];if(p)renderS(p);}},1000);
+}
+
+/* ════════════════════════════
+   NURSE QUEUE (FR-06)
+   ════════════════════════════ */
+function loadQ(){
+  const q=Object.values(S.pts).filter(p=>p.status==='waiting')
+           .sort((a,b)=>a.esi-b.esi||new Date(a.ts)-new Date(b.ts));
+  const crit=q.filter(p=>p.esi<=2).length;
+  const rev=q.filter(p=>p.flag&&!p.overridden).length;
+  const trt=Object.values(S.pts).filter(p=>p.status==='in_treatment').length;
+  document.getElementById('ns-c').textContent=crit;
+  document.getElementById('ns-w').textContent=q.length;
+  document.getElementById('ns-t').textContent=trt;
+  document.getElementById('ns-r').textContent=rev;
+
+  const fp=document.getElementById('fpanel');
+  const fl=document.getElementById('flist');
+  const flagged=q.filter(p=>p.flag&&!p.overridden);
+  if(flagged.length>0){
+    fp.style.display='block';
+    fl.innerHTML=flagged.map(p=>`
+      <div class="fpi">
+        <div class="eb e${p.esi}" style="width:24px;height:24px;font-size:10px">${p.esi}</div>
+        <div style="flex:1"><strong>${p.nm}</strong> (Age ${p.ag}) — Confidence: <span style="color:var(--rd);font-weight:700">${Math.round(p.conf*100)}%</span></div>
+        <button class="btn bd sm" onclick="openO('${p.id}')">Override ESI</button>
+      </div>`).join('');
+  }else{fp.style.display='none';}
+
+  const body=document.getElementById('qbody');
+  if(q.length===0){body.innerHTML='<div style="padding:32px;text-align:center;color:#888;font-size:13px">No patients in queue. Use <strong>Patient Registration</strong> to add patients.</div>';return;}
+
+  body.innerHTML=`<table class="gt">
+    <thead><tr><th>#</th><th>Patient</th><th>ESI</th><th>Symptoms</th><th>Wait</th><th>Doctor</th><th>Vitals</th><th>Photo</th><th>Actions</th></tr></thead>
+    <tbody>${q.map((p,i)=>`
+      <tr class="${p.esi<=2?'crt':p.flag&&!p.overridden?'flg':''}">
+        <td style="font-weight:700;color:var(--nv)">${i+1}</td>
+        <td><div style="font-weight:600">${p.nm}</div><div style="font-size:11px;color:#666">Age ${p.ag}</div></td>
+        <td><div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap">
+          <div class="eb e${p.esi}" style="width:24px;height:24px;font-size:10px">${p.esi}</div>
+          ${p.overridden?'<span class="tag tin" style="font-size:10px">OVR</span>':''}
+          ${p.flag&&!p.overridden?'<span class="tag tfl" style="font-size:9.5px">&#9888;Review</span>':''}
+        </div></td>
+        <td style="max-width:160px"><div style="font-size:11.5px;color:#555;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:150px" title="${p.sy}">${p.sy}</div></td>
+        <td><strong style="color:var(--nv)">${calcW(p.esi,p.id)}m</strong></td>
+        <td style="font-size:11.5px">${p.doc.nm}</td>
+        <td>${p.vitals?'<span class="tag tdn">&#10003;</span>':'<span class="tag trv">Pending</span>'}</td>
+        <td>${p.photo?'<span class="tag tok">&#128247;</span>':'<span style="font-size:11px;color:#bbb">—</span>'}</td>
+        <td><div style="display:flex;gap:4px;flex-wrap:wrap">
+          <button class="btn bo sm" onclick="openV('${p.id}')">Vitals</button>
+          <button class="btn bo sm" onclick="openO('${p.id}')">Override</button>
+          <button class="btn bp sm" onclick="callP('${p.id}')">Call &#8594;</button>
+        </div></td>
+      </tr>`).join('')}
+    </tbody></table>`;
+}
+
+function openO(id){
+  S.ovrId=id;const p=S.pts[id];
+  document.getElementById('oi').innerHTML=`<strong>${p.nm}</strong> (Age ${p.ag}) — ESI: <strong>Level ${p.esi} — ${ELB[p.esi]}</strong> | Doctor: <strong>${p.doc.nm}</strong>`;
+  document.getElementById('oesi').value=p.esi;
+  document.getElementById('odoc').value='';
+  document.getElementById('orsn').value='';
+  document.getElementById('oerr').style.display='none';
+  om('movr');
+}
+
+function confO(){
+  const esi=parseInt(document.getElementById('oesi').value);
+  const rsn=document.getElementById('orsn').value.trim();
+  const did=document.getElementById('odoc').value;
+  const err=document.getElementById('oerr');
+  if(!rsn||rsn.length<10){err.textContent='Please provide a clinical reason (min 10 chars).';err.style.display='block';return;}
+  const p=S.pts[S.ovrId];const oe=p.esi;
+  p.esi=esi;p.overridden=true;p.ovrReason=rsn;p.flag=false;
+  if(did){const d=DOCS.find(x=>x.id===did);if(d){p.doc.ld=Math.max(0,p.doc.ld-1);p.doc=d;d.ld++;}}
+  S.audit.unshift({ts:new Date().toISOString(),pid:p.id,action:'NURSE_OVERRIDE',
+    old_esi:oe,new_esi:esi,nurse:'Kavita Sharma',reason:rsn,symptoms:p.sy});
+  cm('movr');loadQ();toast('Override recorded in audit log (FR-09-3).');
+}
+
+function openV(id){
+  S.vitId=id;const p=S.pts[id];
+  document.getElementById('vi2').innerHTML=`Recording vitals for: <strong>${p.nm}</strong> (Age ${p.ag})`;
+  if(p.vitals){const[s,d]=p.vitals.bp.split('/');
+    document.getElementById('vs').value=s;document.getElementById('vd').value=d;
+    document.getElementById('vh').value=p.vitals.hr;document.getElementById('vt').value=p.vitals.temp;
+    document.getElementById('vo').value=p.vitals.spo2;}
+  om('mvit');
+}
+
+function saveVit(){
+  S.pts[S.vitId].vitals={bp:document.getElementById('vs').value+'/'+document.getElementById('vd').value,
+    hr:document.getElementById('vh').value,temp:document.getElementById('vt').value,
+    spo2:document.getElementById('vo').value,ts:new Date().toISOString()};
+  cm('mvit');loadQ();toast('Vitals recorded (FR-06-4).');
+}
+
+function callP(id){
+  const p=S.pts[id];p.status='in_treatment';
+  const mins=Math.floor((Date.now()-new Date(p.ts))/60000);
+  const note=`HANDOFF NOTE — ${new Date().toLocaleString('en-IN')}
+${'─'.repeat(46)}
+PATIENT  : ${p.nm}  |  Age: ${p.ag}
+REF NO.  : ${p.id}
+DOCTOR   : ${p.doc.nm} (${p.doc.sp})
+
+PRESENTING SYMPTOMS:
+${p.sy}
+
+ESI LEVEL  : ${p.esi} — ${ELB[p.esi]}
+${p.overridden?`OVERRIDE   : YES\nReason     : ${p.ovrReason}`:'AI TRIAGE  : No override applied'}
+
+VITAL SIGNS:
+${p.vitals?`BP: ${p.vitals.bp} mmHg  |  HR: ${p.vitals.hr} bpm  |  Temp: ${p.vitals.temp}°F  |  SpO₂: ${p.vitals.spo2}%`:'Not recorded prior to handoff'}
+
+INJURY PHOTO ATTACHED: ${p.photo?'Yes — '+p.photoName:'No'}
+
+DIFFERENTIAL DIAGNOSIS:
+${p.df.map((d,i)=>`  ${i+1}. ${d}`).join('\n')}
+
+AI CONFIDENCE : ${Math.round(p.conf*100)}%
+WAIT DURATION : ${mins} minutes
+${'─'.repeat(46)}
+Generated by PraanSetu | SARJAN 2026 | Amnex Infotechnologies`;
+  document.getElementById('hcont').textContent=note;
+  om('mhnd');loadQ();
+}
+
+function cpyH(){
+  navigator.clipboard.writeText(document.getElementById('hcont').textContent)
+    .then(()=>toast('Handoff note copied (FR-07-5).'));
+}
+
+/* ════════════════════════════
+   ADMIN DASHBOARD (FR-08, FR-09)
+   ════════════════════════════ */
+function loadA(){
+  const all=Object.values(S.pts);
+  const wt=all.filter(p=>p.status==='waiting');
+  const tr=all.filter(p=>p.status==='in_treatment');
+  const di=all.filter(p=>p.status==='discharged');
+  const fl=wt.filter(p=>p.flag&&!p.overridden);
+  document.getElementById('ad-w').textContent=wt.length;
+  document.getElementById('ad-t').textContent=tr.length;
+  document.getElementById('ad-d').textContent=di.length;
+  document.getElementById('ad-f').textContent=fl.length;
+  document.getElementById('fc15').textContent=Math.max(0,wt.length-2);
+  document.getElementById('fc60').textContent=Math.max(0,wt.length-8);
+
+  const dist={1:0,2:0,3:0,4:0,5:0};wt.forEach(p=>dist[p.esi]++);
+  const mx=Math.max(...Object.values(dist),1);
+  document.getElementById('esdist').innerHTML=[1,2,3,4,5].map(l=>`
+    <div class="edr">
+      <div class="eb e${l}" style="width:24px;height:24px;font-size:10px;flex-shrink:0">${l}</div>
+      <span style="font-size:11px;color:#555;width:80px;flex-shrink:0">${ELB[l]}</span>
+      <div class="edb"><div class="edf" style="width:${dist[l]/mx*100}%;background:${EC[l]}"></div></div>
+      <span class="edc">${dist[l]}</span>
+    </div>`).join('');
+
+  // date filter
+  const fd=document.getElementById('ffd')?.value;
+  const td=document.getElementById('ftd')?.value;
+  let filtered=all;
+  if(fd)filtered=filtered.filter(p=>new Date(p.ts)>=new Date(fd));
+  if(td)filtered=filtered.filter(p=>new Date(p.ts)<=new Date(td+'T23:59:59'));
+
+  // patients table
+  const ptb=document.getElementById('aptb');
+  if(filtered.length===0)ptb.innerHTML='<tr><td colspan="9" style="text-align:center;color:#888;padding:20px">No patients match the filter.</td></tr>';
+  else ptb.innerHTML=filtered.sort((a,b)=>new Date(b.ts)-new Date(a.ts)).map(p=>`
+    <tr>
+      <td style="font-family:monospace;font-size:11px;color:var(--nv)">${p.id}</td>
+      <td><strong>${p.nm}</strong></td><td>${p.ag}</td>
+      <td><div style="display:flex;align-items:center;gap:3px"><div class="eb e${p.esi}" style="width:22px;height:22px;font-size:9px">${p.esi}</div>${p.overridden?'<span class="tag tin" style="font-size:9.5px">OVR</span>':''}</div></td>
+      <td style="max-width:150px"><div style="font-size:11.5px;color:#555;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:140px">${p.sy}</div></td>
+      <td><strong>${calcW(p.esi,p.id)}m</strong></td>
+      <td style="font-size:11.5px">${p.doc.nm}</td>
+      <td><span class="tag ${p.status==='waiting'?'trv':p.status==='in_treatment'?'tcr':'tdn'}">${p.status.replace('_',' ')}</span></td>
+      <td style="font-size:11px;color:#666">${new Date(p.ts).toLocaleTimeString('en-IN')}</td>
+    </tr>`).join('');
+
+  // flagged table
+  const ftb=document.getElementById('aftb');
+  if(fl.length===0)ftb.innerHTML='<tr><td colspan="7" style="text-align:center;color:#888;padding:20px">No flagged patients.</td></tr>';
+  else ftb.innerHTML=fl.map(p=>`
+    <tr style="background:#fffbec">
+      <td style="font-family:monospace;font-size:11px;color:var(--nv)">${p.id}</td>
+      <td><strong>${p.nm}</strong></td><td>${p.ag}</td>
+      <td><div class="eb e${p.esi}" style="width:22px;height:22px;font-size:9px">${p.esi}</div></td>
+      <td><span style="color:var(--rd);font-weight:700">${Math.round(p.conf*100)}%</span> <span style="font-size:10.5px;color:var(--rd)">&lt; 60% threshold</span></td>
+      <td style="font-size:11.5px;color:#555;max-width:200px">${p.sy.substring(0,70)+(p.sy.length>70?'…':'')}</td>
+      <td style="font-size:11px;color:#666">${new Date(p.ts).toLocaleTimeString('en-IN')}</td>
+    </tr>`).join('');
+
+  // audit
+  const atb=document.getElementById('aatb');
+  if(S.audit.length===0)atb.innerHTML='<tr><td colspan="6" style="text-align:center;color:#888;padding:20px">No audit entries yet.</td></tr>';
+  else atb.innerHTML=S.audit.map(a=>{
+    const pct=a.conf?Math.round(a.conf*100):null;
+    const cc=pct?pct>=80?'#27ae60':pct>=60?'#f39c12':'#c0392b':'';
+    return`<tr>
+      <td style="font-size:11px;color:#666">${new Date(a.ts).toLocaleTimeString('en-IN')}</td>
+      <td style="font-family:monospace;font-size:10.5px;color:var(--nv)">${a.pid}</td>
+      <td><span class="tag ${a.action==='AI_TRIAGE'?'tin':'tcr'}">${a.action}</span></td>
+      <td>${a.esi?`<div class="eb e${a.esi}" style="width:22px;height:22px;font-size:9px">${a.esi}</div>`:a.old_esi?`<div style="display:flex;align-items:center;gap:2px;font-size:11px"><div class="eb e${a.old_esi}" style="width:20px;height:20px;font-size:9px">${a.old_esi}</div>&#8594;<div class="eb e${a.new_esi}" style="width:20px;height:20px;font-size:9px">${a.new_esi}</div></div>`:'—'}</td>
+      <td>${pct?`<span style="font-weight:700;color:${cc};font-size:12px">${pct}%</span>`:'—'}</td>
+      <td style="font-size:11.5px;color:#555;max-width:180px">${a.symptoms?a.symptoms.substring(0,55)+(a.symptoms.length>55?'…':''):a.reason||a.nurse||'—'}</td>
+    </tr>`;}).join('');
+}
+
+function swT(id,btn){
+  document.querySelectorAll('.tb').forEach(b=>b.classList.remove('on'));
+  document.querySelectorAll('.tp').forEach(p=>p.classList.remove('on'));
+  document.getElementById('tp-'+id).classList.add('on');btn.classList.add('on');loadA();
+}
+
+function clrF(){
+  document.getElementById('ffd').value='';document.getElementById('ftd').value='';
+  document.getElementById('fsh').value='';loadA();
+}
+
+function expCSV(){
+  if(S.audit.length===0){toast('No audit entries to export.');return;}
+  const rows=[['Timestamp','Patient ID','Action','ESI','Confidence','Symptom Input','Notes']];
+  S.audit.forEach(a=>rows.push([a.ts,a.pid,a.action,a.esi||`${a.old_esi}→${a.new_esi}`,a.conf||'',a.symptoms||'',a.reason||a.nurse||'']));
+  const csv=rows.map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\n');
+  const el=document.createElement('a');
+  el.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);
+  el.download='PraanSetu_Audit_'+new Date().toISOString().slice(0,10)+'.csv';
+  el.click();toast('Audit log exported (FR-09-4).');
+}
+
+/* ════════════════════════════
+   MODAL HELPERS
+   ════════════════════════════ */
+function om(id){document.getElementById(id).classList.add('open')}
+function cm(id){document.getElementById(id).classList.remove('open')}
+
+/* ════════════════════════════
+   ACCESSIBILITY
+   ════════════════════════════ */
+function fs(sz){
+  document.body.style.fontSize=sz==='sm'?'12px':sz==='lg'?'16px':'14px';
+  document.querySelectorAll('.ax').forEach(b=>b.classList.remove('on'));
+  event.currentTarget.classList.add('on');
+}
+function hct(){
+  document.body.classList.toggle('hc');
+  const btn=document.getElementById('hcbtn');
+  if(document.body.classList.contains('hc')){document.body.style.filter='invert(1) hue-rotate(180deg)';btn.classList.add('on');btn.textContent='Normal Contrast';}
+  else{document.body.style.filter='';btn.classList.remove('on');btn.textContent='High Contrast';}
+}
+function setL(l,btn){
+  document.querySelectorAll('.lb').forEach(b=>b.classList.remove('on'));btn.classList.add('on');
+  if(l==='hi')toast('हिन्दी समर्थन शीघ्र आ रहा है — Hindi support coming soon.');
+}
+
+/* ════════════════════════════
+   TOAST
+   ════════════════════════════ */
+function toast(msg){
+  const t=document.createElement('div');
+  t.style.cssText='position:fixed;bottom:18px;right:18px;background:var(--nv);color:#fff;padding:10px 16px;border-radius:4px;font-size:13px;z-index:999;box-shadow:0 3px 12px rgba(0,0,0,.2);max-width:340px;border-left:4px solid var(--sf);line-height:1.4';
+  t.textContent='✓ '+msg;document.body.appendChild(t);setTimeout(()=>t.remove(),3200);
+}
+
+/* ════════════════════════════
+   SEED DEMO DATA
+   ════════════════════════════ */
+setTimeout(()=>{
+  const demos=[
+    {nm:'Anjali Singh', ag:62,ct:'9811234567',sy:'Severe chest pain radiating to left arm, profuse sweating, shortness of breath for 30 minutes'},
+    {nm:'Mohan Verma',  ag:35,ct:'9822345678',sy:'High fever 104°F, severe headache, stiff neck, cannot tolerate bright light since 4 hours'},
+    {nm:'Priti Shah',   ag:28,ct:'9833456789',sy:'Minor ankle sprain from jogging, mild swelling, pain 4/10, can walk slowly'},
+    {nm:'Ramesh Kumar', ag:45,ct:'9876543210',sy:'Moderate chest discomfort and slight breathlessness when climbing stairs',id:'PT-DEMO01'},
+  ];
+  demos.forEach(d=>{
+    const tr=triage(d.sy);const id=d.id||uid();
+    S.pts[id]={id,nm:d.nm,ag:d.ag,ct:d.ct,sy:d.sy,esi:tr.esi,conf:tr.conf,df:tr.df,
+               ex:tr.ex,doc:tr.doc,flag:tr.flag,status:'waiting',vitals:null,
+               overridden:false,ovrReason:null,photo:null,photoName:null,
+               ts:new Date(Date.now()-Math.random()*1800000).toISOString()};
+    S.audit.unshift({ts:new Date().toISOString(),pid:id,action:'AI_TRIAGE',esi:tr.esi,conf:tr.conf,symptoms:d.sy});
+    tr.doc.ld++;
+  });
+  S.pts['PT-DEMO01'].vitals={bp:'138/88',hr:'88',temp:'99.1',spo2:'96',ts:new Date().toISOString()};
+},200);
+
+</script>
+
+</body>
+</html>
